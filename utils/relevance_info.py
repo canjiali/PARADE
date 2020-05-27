@@ -149,9 +149,7 @@ def partition_fold(nb_fold, qrels_filename):
     candidate_qid = np.random.permutation(candidate_qid)
     for j, qid in enumerate(candidate_qid):
       partitions[j].append(qid)
-    # partitions[:, i] = candidate_qid
   total = sum([len(qids) for qids in partitions])
   assert total == len(nb_positive_dict.items())
-  # partitions = partitions.tolist()
-  # partitions = [sorted(p) for p in partitions]
+
   return partitions

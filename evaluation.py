@@ -127,22 +127,7 @@ def tt_test(qrels, res1, res2, sample_qrels=None, metrics=None):
   return test_dict
 
 if __name__ == '__main__':
-  # qrels = '/home/lcj/data/robust04/original/qrels.robust2004'
-  # res = '/media/klaas/research/01_ir/BM25RocQEBase/robust_docnos.res'
-  # res1, res2 = argv[1], argv[2]
-  # print(tt_test(qrels, res1, res2))
-  # print(evaluate_trec(argv[1], argv[2], ['map', 'P_10']))
-  # print(evaluate_sample_trec(argv[3], argv[4], ['infNDCG', 'infAP']))
-  #
-  # print(evaluate_metrics(argv[1], argv[2], argv[3], ['map', 'P_10', 'infNDCG']))
-  # print(evaluate_trec_perquery(argv[1], argv[2], ['Rprec', 'P_10']))
-  # print(evaluate_sample_trec_perquery(argv[3], argv[4], ['infNDCG']))
-  # print(evaluate_trec_per_query(argv[1], argv[2]))
-  # print(evaluate_metrics_perquery(argv[1], argv[2], argv[3], ['Rprec', 'P_10', 'infNDCG']))
-  # print(tt_test(argv[1], argv[2], argv[3], argv[4], ['Rprec', 'P_10', 'infNDCG']))
 
-  # argv = sys.argv
-  # print(tt_test(argv[1], argv[2], argv[3], None, ['map', 'P_20', 'ndcg_cut_20']))
   parser = argparse.ArgumentParser()
   parser.add_argument("--qrels", help="TREC qrels file path")
   parser.add_argument("--baselines", help="Baseline file paths, seperated by ','")
