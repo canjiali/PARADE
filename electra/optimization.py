@@ -29,7 +29,7 @@ import tensorflow.compat.v1 as tf
 
 def create_optimizer(
     loss, learning_rate, num_train_steps, weight_decay_rate=0.0, use_tpu=False,
-    warmup_steps=0, warmup_proportion=0, lr_decay_power=1.0,
+    num_warmup_steps=0, warmup_proportion=0, lr_decay_power=1.0,
     layerwise_lr_decay_power=-1, n_transformer_layers=None):
   """Creates an optimizer and training op."""
   global_step = tf.train.get_or_create_global_step()
@@ -40,9 +40,9 @@ def create_optimizer(
       end_learning_rate=0.0,
       power=lr_decay_power,
       cycle=False)
-  warmup_steps = max(num_train_steps * warmup_proportion, warmup_steps)
+  num_warmup_steps = max(num_train_steps * warmup_proportion, num_warmup_steps)
   learning_rate *= tf.minimum(
-      1.0, tf.cast(global_step, tf.float32) / tf.cast(warmup_steps, tf.float32))
+      1.0, tf.cast(global_step, tf.float32) / tf.cast(num_warmup_steps, tf.float32))
 
   if layerwise_lr_decay_power > 0:
     learning_rate = _get_layer_lrs(learning_rate, layerwise_lr_decay_power,
