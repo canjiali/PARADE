@@ -152,11 +152,9 @@ if __name__ == '__main__':
   baselines = args.baselines.split(",")
   runs = args.runs.split(",")
 
-  print(baselines)
-  print(runs)
-  print(args.qrels)
+
   for trec_run in runs:
     for baseline in baselines:
       print(baseline)
       print(trec_run)
-      tt_test(args.qrels, baseline, trec_run, None, ['map', 'P_20', 'ndcg_cut_20'])
+      tt_test(args.qrels, baseline, trec_run, None, ['P_20', 'ndcg_cut_20'])
