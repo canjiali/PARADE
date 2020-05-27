@@ -56,6 +56,7 @@ We support two pre-trained model instantiations:
 - ELECTRA
 
 For all the pra-trained models, we first fine-tune them on the MSMARCO passage collection.
+This is IMPORTANT, as it can improve the nDCG@20 by 2 points generally.
 To figure out the way of doing that, please check out [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
 The fine-tuned model will be the initialized model in DocuBERT.
 Just pass it to the `BERT_ckpt` argument in the following snippet. 
