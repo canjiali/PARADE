@@ -4,6 +4,15 @@
 DocuBERT is a document re-ranking model based on the pre-trained language models.
 This repo contains the code to reproduce DocuBERT.
 
+We support the following DocuBERT variants:
+- DocuBERT-AvgP (named `cls_avgP` in the code)
+- DocuBERT-wAvgP (named `cls_wAvgP` in the code)
+- DocuBERT-MaxP (namded `cls_maxP` in the code)
+- DocuBERT-Transformer (namded `cls_transformer` in the code)
+
+We support two pre-trained model instantiations:
+- BERT
+- ELECTRA
 
 ## Getting Started
 To run DocuBERT, there're three steps ahead.
@@ -66,15 +75,7 @@ Everything is prepared now!
 
 ### 2. Model Traning and Evaluation
 
-We support the following DocuBERT variants:
-- DocuBERT-AvgP (passed to the `method` as cls_avgP)
-- DocuBERT-wAvgP (passed to the `method` as cls_wAvgP)
-- DocuBERT-MaxP (passed to the `method` as cls_maxP)
-- DocuBERT-Transformer (passed to the `method` as cls_transformer)
 
-We support two pre-trained model instantiations:
-- BERT
-- ELECTRA
 
 For all the pra-trained models, we first fine-tune them on the MSMARCO passage collection.
 This is IMPORTANT, as it can improve the nDCG@20 by 2 points generally.
