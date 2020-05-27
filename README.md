@@ -10,7 +10,7 @@ Data for 5 folds are required here.
 The standard `qrels`, `query`, `trec_run` files can be fulfilled by [Anserini](https://github.com/castorini/anserini),
 please check out their notebook for further details.
 The `corpus` file can also be extarcted by Anserini to form the `docno \t content` paired text.
-The snippet also exists in `scripts/run.convert.data.sh`.
+
 ```bash
 export max_num_train_instance_perquery=1000
 export rerank_threshold=100
@@ -40,6 +40,7 @@ do
     --rerank_threshold=$rerank_threshold 
 done
 ```
+The above snippet also exists in `scripts/run.convert.data.sh`.
 Note that if you're going to run the code on TPU, you need to upload the training/testing data to GCS.
 
 ### 2. Model Traning and Evaluation
@@ -111,6 +112,7 @@ local_dir=/data2/$dataset/reruns/$field/num-segment-${num_segment}/$runid
 qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.txt
 mkdir -p $local_dir
 
+# download 5-fold resutls from GCS
 for fold in {1..5}
 do
   gsutil cp $gs_dir/fold-${fold}/fold_*epoch_${epoch}_bert_predictions_test.txt $local_dir
@@ -123,6 +125,7 @@ if [ "$num_result" != "5" ]; then
   exit
 fi
 
+# evaluate the result using trec_eval
 cat ${local_dir}/fold_*epoch_${epoch}_bert_predictions_test.txt >> ${local_dir}/merge_epoch${epoch}
 /data/tool/trec_eval-9.0.7/trec_eval ${qrels_path} ${local_dir}/merge_epoch${epoch} -m ndcg_cut.20 -m P.20  >> ${local_dir}/result_epoch${epoch}
 cat ${local_dir}/result_epoch${epoch}
@@ -133,7 +136,7 @@ P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
 ```
 That's good!
-The above steps can be done all at once by running `scripts/run.reranking.sh`.
+The above steps can also be done all at once by running `scripts/run.reranking.sh`.
 
 ### 3. Significance Test
 To do a significance test, just configurate the `trec_eval` path in the `evaluation.py` file. 
@@ -150,6 +153,6 @@ OrderedDict([('P_20', '0.4277'), ('ndcg_cut_20', '0.4931')])
 OrderedDict([('P_20', '0.4604'), ('ndcg_cut_20', '0.5399')])
 OrderedDict([('P_20', 1.2993259211924425e-11), ('ndcg_cut_20', 8.306604295574242e-09)])
 ```
-The upper two lines are the sanity checks of your run values.
+The upper two lines are the sanity checks of your run performance values.
 The last line represents the p-values.
 DocuBERT achieve significant improvement over BERT-MaxP (p < 0.01) !
