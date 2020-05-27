@@ -65,10 +65,6 @@ flags.DEFINE_string(
 )
 
 flags.DEFINE_string(
-    "query_field", 'title',
-    "None if no field, else title, desc, narr, question")
-
-flags.DEFINE_string(
     "dataset", None,
     "which dataset to run on. it would correspond to the fold config of qids"
 )
@@ -211,13 +207,13 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
     from_distilled_student=from_distilled_student
   )
   output_layer = None
-  if aggregation_method == 'wAvgP':
+  if aggregation_method == 'cls_wAvgP':
     output_layer = docubert_model.reduced_by_wAvgP()
-  elif aggregation_method == 'avgP':
+  elif aggregation_method == 'cls_avgP':
     output_layer = docubert_model.reduced_by_avgP()
-  elif aggregation_method == 'maxP':
+  elif aggregation_method == 'cls_maxP':
     output_layer = docubert_model.reduced_by_maxP()
-  elif aggregation_method == 'transformer':
+  elif aggregation_method == 'cls_transformer':
     output_layer = docubert_model.reduced_by_transformer(is_training, num_transformer_layers=2)
   else:
     raise ValueError("Un-supported model type: {}".format(aggregation_method))
