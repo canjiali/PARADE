@@ -1,10 +1,10 @@
 # transformers_ranking
 
 ## Getting Started
-This repository simply requires three steps to run an ad-hoc ranking experiment.
+This repository simply requires three steps to run an ad-hoc document re-ranking experiment.
 We give a example of how to run DocuEBRT on Robust04 dataset using the title query.
 
-### Data Preparation
+### 1. Data Preparation
 We need to split the documets into passages, write them into TFrecord files.
 Data for 5 folds are required here.
 The standard `qrels`, `query`, `trec_run` files can be fulfilled by [Anserini](https://github.com/castorini/anserini),
@@ -19,7 +19,7 @@ export num_segment=16
 
 for fold in {1..5}
 do
-  export output_dir="/data2/robust/runs/title/training.data/fold-"$fold"-train-"$max_num_train_instance_perquery"-test-"$rerank_threshold
+  export output_dir="/data2/robust/runs/title/training.data/num-segment-${num_segment}/fold-${fold}-train-${max_num_train_instance_perquery}-test-${rerank_threshold}
   mkdir -p $output_dir 
 
   python3 generate_data.py \
@@ -42,7 +42,7 @@ done
 ```
 Note that if you're going to run the code in TPU, you need to upload the training/testing data to GCS.
 
-### Model Traning and Evaluation
+### 2. Model Traning and Evaluation
 
 We support the following DocuBERT variants:
 - DocuBERT-AvgP (passed to the `method` as cls_avgP)
@@ -51,7 +51,7 @@ We support the following DocuBERT variants:
 - DocuBERT-Transformer (passed to the `method` as cls_transformer)
 
 For all the pra-trained models, we first fine-tune them on the MSMARCO passage collection.
-To figure out the way of doing that, please check out this repository [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
+To figure out the way of doing that, please check out [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
 The fine-tuned model will be the initialized model by passing it to the `BERT_ckpt` argument in the following snippet. 
 
 
@@ -69,7 +69,7 @@ export epoch=1
 #export BERT_ckpt=gs://canjiampii/checkpoint/bertbase_msmarco/bert_model.ckpt
 export BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json 
 export BERT_ckpt=gs://canjiampii/experiment/vanilla_electra_base_onMSMARCO/model.ckpt-400000
-export runid=testcode_electra_base_onMSMARCO_${method}
+export runid=electra_base_onMSMARCO_${method}
 
 for fold in {1..5}
 do
@@ -102,7 +102,7 @@ do
     --tpu_name=$tpu_name 
 done
 ```
-The 5 fold test results are done now.
+The 5-fold training/testing are done now.
 Next you need to download the resutls from GCS, then merge them, and evaluate them!
 ```bash
 gs_dir=gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid
@@ -134,7 +134,7 @@ ndcg_cut_20             all     0.5399
 
 The above steps can be done all at once by running `scripts/run.reranking.sh`.
 
-### Significance Test
+### 3. Significance Test
 To do a significance test, just configurate the `trec_eval` path in the `evaluation.py` file. 
 Then simply run the following command, here we compare DocuBERT with BERT-MaxP:
 ```
