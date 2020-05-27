@@ -52,4 +52,4 @@ gs_dir=gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segmen
 local_dir=/data2/$dataset/reruns/$field/num-segment-${num_segment}/$runid
 qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.txt
 
-./script/download_and_evaluate.sh  ${gs_dir} ${local_dir} ${qrels_path} ${epoch} 
+./scripts/download_and_evaluate.sh  ${gs_dir} ${local_dir} ${qrels_path} ${epoch} 
