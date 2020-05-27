@@ -45,8 +45,11 @@ do
     --rerank_threshold=$rerank_threshold 
 done
 ```
-The above snippet also exists in `scripts/run.convert.data.sh`.
+You should be able to see 5 sub-folders in the `output_dir` folder,
+with each contains a train file and a test file.
 Note that if you're going to run the code on TPU, you need to upload the training/testing data to Google Cloud Storage(GCS).
+
+The above snippet also exists in `scripts/run.convert.data.sh`.
 
 If you bother getting the raw text from Anserini, 
 you can also replace the `anserini/src/main/java/io/anserini/index/IndexUtils.java` file by the `extra/IndexUtils.java` file in this repo,
