@@ -8,8 +8,8 @@ We give a example of how to run DocuEBRT on Robust04 dataset using the title que
 We need to split the documets into passages, write them into TFrecord files.
 Data for 5 folds are required here.
 The standard `qrels`, `query`, `trec_run` files can be fulfilled by [Anserini](https://github.com/castorini/anserini),
-The `corpus` file can be extarcted by Anserini to form the `docno \t content` paired text.
-please see their notebook for further details.
+please check out their notebook for further details.
+The `corpus` file can also be extarcted by Anserini to form the `docno \t content` paired text.
 The snippet also exists in `scripts/run.convert.data.sh`.
 ```bash
 export max_num_train_instance_perquery=1000
