@@ -148,9 +148,10 @@ def convert_data_pointwise(writer, tokenizer, qid_list, relevance_dict, corpus_d
     supervised_docno_list = relevance.get_supervised_docno_list() # initial ranking
 
     # training data from the judged docno,  built from bm25 top1000 result
-    # irrelevant_docno_list = judged_docno_list[0]
-    relevant_docno_list = judged_docno_list[1] + judged_docno_list[2]
-    relevant_docno_list = set(relevant_docno_list)
+    relevant_docno_list = set()
+    if judged_docno_list is not None:
+      relevant_docno_list = judged_docno_list[1] + judged_docno_list[2]
+      relevant_docno_list = set(relevant_docno_list)
     for docno in supervised_docno_list[:max_num_example]:
       relation_label = 1 if docno in relevant_docno_list else 0
       query = query_dict[qid]
