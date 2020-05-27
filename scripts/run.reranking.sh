@@ -14,7 +14,7 @@ export epoch=1
 export BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json
 export BERT_ckpt=gs://canjiampii/experiment/vanilla_electra_base_onMSMARCO/model.ckpt-400000
 #export BERT_ckpt=gs://canjiampii/checkpoint/bertbase_msmarco/bert_model.ckpt
-export runid=electra_base_onMSMARCO_${method}
+export runid=testcode_electra_base_onMSMARCO_${method}
 
 for fold in {1..5}
 do
