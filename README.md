@@ -1,8 +1,8 @@
 # transformers_ranking
 
 ## Getting Started
-This repository simply requires three steps to run an ad-hoc document re-ranking experiment.
-We give a example of how to run DocuEBRT on Robust04 dataset using the title query.
+To run DocuBERT, there're three steps ahead.
+We give a detailed example on Robust04 dataset using the title query.
 
 ### 1. Data Preparation
 We need to split the documets into passages, write them into TFrecord files.
@@ -40,7 +40,7 @@ do
     --rerank_threshold=$rerank_threshold 
 done
 ```
-Note that if you're going to run the code in TPU, you need to upload the training/testing data to GCS.
+Note that if you're going to run the code on TPU, you need to upload the training/testing data to GCS.
 
 ### 2. Model Traning and Evaluation
 
@@ -52,7 +52,8 @@ We support the following DocuBERT variants:
 
 For all the pra-trained models, we first fine-tune them on the MSMARCO passage collection.
 To figure out the way of doing that, please check out [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
-The fine-tuned model will be the initialized model by passing it to the `BERT_ckpt` argument in the following snippet. 
+The fine-tuned model will be the initialized model in DocuBERT.
+Just pass it to the `BERT_ckpt` argument in the following snippet. 
 
 
 ```bash
@@ -131,7 +132,7 @@ The model performance will automatically output on yor screen. On Robust04 title
 P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
 ```
-
+That's good!
 The above steps can be done all at once by running `scripts/run.reranking.sh`.
 
 ### 3. Significance Test
