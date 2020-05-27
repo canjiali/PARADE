@@ -51,6 +51,10 @@ We support the following DocuBERT variants:
 - DocuBERT-MaxP (passed to the `method` as cls_maxP)
 - DocuBERT-Transformer (passed to the `method` as cls_transformer)
 
+We support two pre-trained model instantiations:
+- BERT
+- ELECTRA
+
 For all the pra-trained models, we first fine-tune them on the MSMARCO passage collection.
 To figure out the way of doing that, please check out [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
 The fine-tuned model will be the initialized model in DocuBERT.
