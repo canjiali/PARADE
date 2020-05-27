@@ -1,7 +1,7 @@
 # transformers_ranking
 
 ## Introduction
-DocuBERT is a document re-ranking model based on pre-trained language models.
+DocuBERT is a document re-ranking model based on the pre-trained language models.
 This repo contains the code to reproduce DocuBERT.
 
 
@@ -46,7 +46,7 @@ do
 done
 ```
 The above snippet also exists in `scripts/run.convert.data.sh`.
-Note that if you're going to run the code on TPU, you need to upload the training/testing data to GCS.
+Note that if you're going to run the code on TPU, you need to upload the training/testing data to Google Cloud Storage(GCS).
 
 If you bother getting the raw text from Anserini, 
 you can also replace the `anserini/src/main/java/io/anserini/index/IndexUtils.java` file by the `extra/IndexUtils.java` file in this repo,
@@ -136,6 +136,7 @@ qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.t
 mkdir -p $local_dir
 
 # download 5-fold resutls from GCS
+# if you're in a local machine, you don't need to download
 for fold in {1..5}
 do
   gsutil cp $gs_dir/fold-${fold}/fold_*epoch_${epoch}_bert_predictions_test.txt $local_dir
@@ -178,4 +179,4 @@ OrderedDict([('P_20', 1.2993259211924425e-11), ('ndcg_cut_20', 8.306604295574242
 ```
 The upper two lines are the sanity checks of your run performance values.
 The last line represents the p-values.
-DocuBERT achieve significant improvement over BERT-MaxP (p < 0.01) !
+DocuBERT achieves significant improvement over BERT-MaxP (p < 0.01) !
