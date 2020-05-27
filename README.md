@@ -1,5 +1,10 @@
 # transformers_ranking
 
+## Introduction
+DocuBERT is a document re-ranking model based on pre-trained language models.
+This repo contains the code to reproduce DocuBERT.
+
+
 ## Getting Started
 To run DocuBERT, there're three steps ahead.
 We give a detailed example on Robust04 dataset using the title query.
@@ -42,6 +47,19 @@ done
 ```
 The above snippet also exists in `scripts/run.convert.data.sh`.
 Note that if you're going to run the code on TPU, you need to upload the training/testing data to GCS.
+
+If you bother getting the raw text from Anserini, 
+you can also replace the `anserini/src/main/java/io/anserini/index/IndexUtils.java` file by the `extra/IndexUtils.java` file in this repo,
+then re-build Anserini.
+Below is how we fetch the raw text
+```bash
+anserini_path="path_to_anserini"
+# say you're given a BM25 run file run.BM25.txt
+cut -d ' ' -f3 run.BM25.txt | sort | uniq > docnolist
+${anserini_path}/target/appassembler/bin/IndexUtils -dumpTransformedDocBatch docnolist
+```
+then you get the required raw text in the same directory of docnolist. 
+Everything is prepared now!
 
 ### 2. Model Traning and Evaluation
 
