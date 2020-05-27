@@ -2,7 +2,7 @@
 
 # things to take care of: tpu_name, method, runid
 export method=cls_transformer
-export tpu_name=node-zhi2
+export tpu_name=node-5
 export field=title
 export dataset=robust04
 export num_segment=16
@@ -21,7 +21,7 @@ do
   export data_dir="gs://canjiampii/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
   export output_dir="gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid/fold-$fold"
 
-  python3 -u run_ranking_v2.py \
+  python3 -u run_reranking.py \
     --pretrained_model=electra \
     --do_train=True \
     --do_eval=True \
