@@ -126,8 +126,6 @@ flags.DEFINE_string(
     "The output directory where the model checkpoints will be written.")
 
 ## Other parameters
-
-
 flags.DEFINE_bool(
     "do_lower_case", True,
     "Whether to lower case the input text. Should be True for uncased "
@@ -301,9 +299,6 @@ def create_model(kd_method, kd_lambda, aggregation_method, pretrained_model, tea
     loss_CE = tf.nn.softmax_cross_entropy_with_logits_v2(one_hot_labels, student_logits)
     loss_CE = tf.reduce_mean(loss_CE)
 
-    # KD part
-    # pred part
-
     loss_KD = None
     if kd_method == 'CE':
       loss_pred = tf.nn.softmax_cross_entropy_with_logits_v2(teacher_probs, student_logits)
@@ -317,7 +312,6 @@ def create_model(kd_method, kd_lambda, aggregation_method, pretrained_model, tea
     else:
       raise ValueError("Un-supported KD method")
 
-    # finally
     loss = kd_lambda * loss_CE + (1.0 - kd_lambda) * tf.square(temperature) * loss_KD
 
     return (loss, per_example_loss, student_log_probs)
@@ -342,7 +336,6 @@ def model_fn_builder(kd_method, kd_lambda, aggregation_method, pretrained_model,
     segment_ids = features["segment_ids"]
     label_ids = features["label"]
     num_segments = features["num_segments"]
-    # len_gt_titles = features["len_gt_titles"]
 
     is_training = (mode == tf.estimator.ModeKeys.TRAIN)
     (total_loss, per_example_loss, log_probs) = create_model(
@@ -356,9 +349,6 @@ def model_fn_builder(kd_method, kd_lambda, aggregation_method, pretrained_model,
 
     scaffold_fn = None
     initialized_variable_names = []
-    # student_prefix = "student/"
-    # if FLAGS.from_distilled_student:
-    #   student_prefix = ""
     if teacher_init_checkpoint and student_init_checkpoint:
       (student_assignment_map, student_initialized_variable_names
        ) = modeling.get_assignment_map_from_checkpoint(
@@ -415,8 +405,6 @@ def model_fn_builder(kd_method, kd_lambda, aggregation_method, pretrained_model,
           predictions={
               "log_probs": log_probs,
               "label_ids": label_ids,
-              # "reduce_all_cls_probs": reduce_all_cls_probs
-              # "len_gt_titles": len_gt_titles,
           },
           scaffold_fn=scaffold_fn)
 
@@ -511,7 +499,6 @@ def main(_):
       eval_batch_size=FLAGS.eval_batch_size,
       predict_batch_size=FLAGS.eval_batch_size)
 
-
   if FLAGS.do_train:
     tf.logging.info("***** Running training *****")
     tf.logging.info("  Batch size = %d", FLAGS.train_batch_size)
@@ -530,8 +517,6 @@ def main(_):
     tf.logging.info("***** Running evaluation on the test set*****")
     tf.logging.info("  Batch size = %d", FLAGS.eval_batch_size)
 
-    max_eval_examples = None
-
     eval_input_fn = input_fn_builder(
       dataset_path=[os.path.join(FLAGS.data_dir, "dataset_test.tfrecord")],
       max_num_segments_perdoc=FLAGS.max_num_segments_perdoc,
@@ -544,12 +529,6 @@ def main(_):
     result = estimator.predict(input_fn=eval_input_fn,
                                yield_single_examples=True)
     results = []
-    # iii = 0
-    # for item in result:
-    #   if iii % 100 == 0:
-    #     print(item["reduce_all_cls_probs"][:12])
-    #   iii += 1
-    # assert 1==4
     for item in result:
       results.append(
         (item["log_probs"], item["label_ids"]))
