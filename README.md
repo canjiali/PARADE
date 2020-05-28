@@ -163,7 +163,7 @@ The model performance will automatically output on yor screen. On Robust04 title
 P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
 ```
-That's good!
+Looks good!
 The above steps can also be done all at once by running `scripts/run.reranking.sh`.
 
 ### 3. Significance Test
@@ -199,12 +199,10 @@ export rerank_threshold=100
 export learning_rate=3e-6
 export epoch=3
 
-
 student_BERT_config=gs://canjiampii/checkpoint/uncased_L-10_H-768_A-12_medium_10_base/bert_config.json
 teacher_BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json
 student_BERT_ckpt_parent=gs://canjiampii/checkpoint/bert_small_onRobust04
 teacher_BERT_ckpt_parent=gs://canjiampii/adhoc/experiment/robust04/title/num-segment-16/bertbase_onMSMARCO_cls_transformer
-
 
 #MSE CE 
 kd_method=MSE
@@ -218,7 +216,7 @@ do
   export teacher_BERT_ckpt=${student_BERT_parent}/fold-${fold}/model.ckpt-18000
   export student_BERT_ckpt=${student_BERT_parent}/fold-${fold}/final
 
-  python3 -u run_knowledge_distll.py \
+  python3 -u run_knowledge_distill.py \
     --pretrained_model=bert \
     --kd_method=${kd_method} \
     --kd_lambda=${kd_lambda} \
@@ -254,6 +252,7 @@ qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.t
 
 ./scripts/download_and_evaluate.sh  ${gs_dir} ${local_dir} ${qrels_path} ${epoch} 
 ```
+The script also lies in `scripts/run.kd.sh`.
 It outputs the following results for DocuBERT using BERT-small with only 4 layers!
 ```bash
 P_20                    all     0.4365
