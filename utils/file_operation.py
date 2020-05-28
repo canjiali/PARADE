@@ -26,6 +26,7 @@ def load_ntcir_query(topic_filename, fields):
     query_dict[qid] = query
   return query_dict
 
+
 def load_xml_query(topic_filename, field):
 
   with open(topic_filename, 'r') as f:

@@ -5,14 +5,15 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 
 class Relevance(object):
-  ''' relevance
 
-  :param qid, int, query id
-  :param judged_docno_list, list of list, judged docnos in the feature file of letor
-  :param supervised_docno_list, list, top K BM25 docnos
-
-  '''
   def __init__(self, qid, judged_docno_list, supervised_docno_list, supervised_score_list):
+    """
+
+    :param qid: str, query id
+    :param judged_docno_list: list of list, judged docnos from the result file
+    :param supervised_docno_list: list, top K BM25 docnos
+    :param supervised_score_list: list, top K BM25 document scores
+    """
 
     self._qid = qid
     self._judged_docno_list = judged_docno_list
@@ -44,7 +45,6 @@ def update_qrels_from_res_and_qrels(qrels_file, res_dict):
   for line in qrels:
     tokens = line.strip().split()
     qid, _, docno, relevance_score = tokens
-    # qid, docno, relevance_score = tokens[0], tokens[2], tokens[3]
     relevance_score, qid = int(relevance_score), str(qid)
     if qid != prev_qid:
       if len(relevance_map.values()) > 0:
@@ -84,7 +84,6 @@ def update_res_relevance(res_file):
 
   with open(res_file, 'r') as f:
     res = f.readlines()
-
   res_relevance_dict = collections.OrderedDict()
   prev_qid = ''
   docno_list, score_list = [], []
@@ -131,6 +130,13 @@ def create_relevance(result_filename, qrels_filename):
 
 
 def partition_fold(nb_fold, qrels_filename):
+  ''' Based on the assumption that number of relevant docs in each fold
+  should be as equal as possible.
+
+  :param nb_fold:
+  :param qrels_filename:
+  :return:
+  '''
   nb_positive_dict = collections.defaultdict(int)
   with open(qrels_filename, 'r') as f:
     for line in f:
@@ -142,7 +148,6 @@ def partition_fold(nb_fold, qrels_filename):
   nb_positive_tuple = sorted(nb_positive_dict.items(), key=operator.itemgetter(1))
   print(nb_positive_tuple)
   sorted_qid_list,  _ = zip(*nb_positive_tuple)
-  # partitions = np.zeros((nb_fold, len(sorted_qid_list)//nb_fold), dtype=np.string_)
   partitions = [[] for i in range(nb_fold)]
   for i in range(len(sorted_qid_list) + nb_fold - 1 // nb_fold):
     candidate_qid = sorted_qid_list[i * nb_fold: (i + 1) * nb_fold]

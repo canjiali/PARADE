@@ -1,7 +1,6 @@
 
 import os
 import re
-import sys
 import argparse
 import subprocess
 
@@ -30,16 +29,12 @@ def run(command, get_ouput=False):
 
 def evaluate_trec(qrels, res, metrics):
 
-  ''' all_trecs, '''
+  # all_trecs
   command = [trec_eval_script_path, '-m', 'all_trec', '-M', '1000', qrels, res]
   output = run(command, get_ouput=True)
-
   metrics_val = []
   for metric in metrics:
     metrics_val.append(re.findall(r'{0}\s+all.+\d+'.format(metric), output)[0].split('\t')[2].strip())
-
-  # MAP = re.findall(r'map\s+all.+\d+', output)[0].split('\t')[2].strip()
-  # P20 = re.findall(r'P_20\s+all.+\d+', output)[0].split('\t')[2].strip()
 
   return OrderedDict(zip(metrics, metrics_val))
 
@@ -47,7 +42,6 @@ def evaluate_trec(qrels, res, metrics):
 def evaluate_sample_trec(qrels, res, metrics):
   command = [sample_eval_script_path, qrels, res]
   output = run(command, get_ouput=True)
-
   metrics_val = []
   for metric in metrics:
     metrics_val.append(re.findall(r'{0}\s+all.+\d+'.format(metric), output)[0].split('\t')[4].strip())
@@ -67,13 +61,13 @@ def evaluate_metrics(qrels, res, sample_qrels=None, metrics=None):
 
   return metrics_val_dict
 
+
 ################################## perquery information ####################################
 def evaluate_trec_perquery(qrels, res, metrics):
 
-  ''' all_trecs, '''
+  # all_trecs
   command = [trec_eval_script_path, '-m', 'all_trec', '-q', '-M', '1000', qrels, res]
   output = run(command, get_ouput=True)
-
   metrics_val = []
   for metric in metrics:
     curr_res = re.findall(r'{0}\s+\t\d+.+\d+'.format(metric), output)
@@ -86,7 +80,6 @@ def evaluate_trec_perquery(qrels, res, metrics):
 def evaluate_sample_trec_perquery(qrels, res, metrics):
   command = [sample_eval_script_path, '-q', qrels, res]
   output = run(command, get_ouput=True)
-
   metrics_val = []
   for metric in metrics:
     curr_res = re.findall(r'{0}\s+\t\d+.+\d+'.format(metric), output)
@@ -99,7 +92,6 @@ def evaluate_sample_trec_perquery(qrels, res, metrics):
 def evaluate_metrics_perquery(qrels, res, sample_qrels=None, metrics=None):
   normal_metrics = [met for met in metrics if not met.startswith('i')]
   infer_metrics = [met for met in metrics if met.startswith('i')]
-
   metrics_val_dict = OrderedDict()
   if len(normal_metrics) > 0:
     metrics_val_dict.update(evaluate_trec_perquery(qrels, res, metrics=normal_metrics))
@@ -136,8 +128,6 @@ if __name__ == '__main__':
 
   baselines = args.baselines.split(",")
   runs = args.runs.split(",")
-
-
   for trec_run in runs:
     for baseline in baselines:
       print(baseline)

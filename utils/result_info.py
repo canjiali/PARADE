@@ -61,12 +61,12 @@ def read_result_from_file(result_file):
 
   res_all = file_operation.parse_corpus(result_file)
   res_dict = collections.OrderedDict()
-  prev_qid, runid = -1, -1
+  prev_qid, runid = '', ''
   docno_list = []
   score_list = []
   for line in res_all:
     tokens = line.split()
-    qid, docno, score, runid = int(tokens[0]), tokens[2], float(tokens[4]), tokens[5]
+    qid, docno, score, runid = tokens[0], tokens[2], float(tokens[4]), tokens[5]
     if qid != prev_qid:
       if len(docno_list) > 0:
         result = Result(qid, docno_list, score_list, runid)

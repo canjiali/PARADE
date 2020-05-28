@@ -102,8 +102,6 @@ flags.DEFINE_integer(
 )
 
 
-# The average length of robust is 689
-
 class PointwiseInstance(object):
   """A single training instance (sentence pair)."""
 
