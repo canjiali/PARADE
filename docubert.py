@@ -15,10 +15,10 @@ class DocuBERT(object):
 
     :param bert_config:
     :param is_training:
-    :param input_ids:
-    :param input_mask:
-    :param segment_ids:
-    :param num_segments:
+    :param input_ids: [B, N, L] <-- [batch_size, num_segemtns, seq_length]
+    :param input_mask: [B, N, L]
+    :param segment_ids: [B, N, L]
+    :param num_segments: [], actual number of segments in a document
     :param pretrained_model:
     :param use_one_hot_embeddings:
     :param scope: may be 'student' or 'teacher' when perform knowledge distillation
