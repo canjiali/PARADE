@@ -67,7 +67,7 @@ def create_optimizer(loss, init_lr, num_train_steps, num_warmup_steps, use_tpu):
   if use_tpu:
     optimizer = tf.tpu.CrossShardOptimizer(optimizer)
 
-  tvars = tf.trainable_variables("student")
+  tvars = tf.trainable_variables()
   grads = tf.gradients(loss, tvars)
 
   # This is how the model was pre-trained.
