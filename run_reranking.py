@@ -18,10 +18,8 @@ from electra import optimization as electra_optimization
 tf.random.set_random_seed(118)
 np.random.seed(118)
 
-
 flags = tf.flags
 FLAGS = flags.FLAGS
-
 
 ## Required parameters
 flags.DEFINE_boolean(
@@ -94,8 +92,6 @@ flags.DEFINE_string(
     "The config json file corresponding to the pre-trained BERT model. "
     "This specifies the model architecture.")
 
-# flags.DEFINE_string("task_name", None, "The name of the task to train.")
-
 flags.DEFINE_string("vocab_filename", None,
                     "The vocabulary file that the BERT model was trained on.")
 
@@ -104,7 +100,6 @@ flags.DEFINE_string(
     "The output directory where the model checkpoints will be written.")
 
 ## Other parameters
-
 flags.DEFINE_string(
     "init_checkpoint", None,
     "Initial checkpoint (usually from a pre-trained BERT model).")
@@ -233,7 +228,6 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
       # I.e., 0.1 dropout
       output_layer = tf.nn.dropout(output_layer, keep_prob=0.9)
     logits = tf.tensordot(output_layer, output_weights, axes=[-1, -1])
-    # logits = tf.matmul(output_layer, output_weights, transpose_b=True)
     logits = tf.nn.bias_add(logits, output_bias)
 
     log_probs = tf.nn.log_softmax(logits, axis=-1)
@@ -262,7 +256,6 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
     segment_ids = features["segment_ids"]
     label_ids = features["label"]
     num_segments = features["num_segments"]
-    # len_gt_titles = features["len_gt_titles"]
 
     is_training = (mode == tf.estimator.ModeKeys.TRAIN)
     (total_loss, per_example_loss, log_probs) = create_model(
@@ -271,7 +264,6 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
         pretrained_model, from_distilled_student)
 
     tvars = tf.trainable_variables()
-
     scaffold_fn = None
     initialized_variable_names = []
     if init_checkpoint:
@@ -327,8 +319,6 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
     return output_spec
 
   return model_fn
-
-
 
 
 def main(_):
@@ -399,7 +389,6 @@ def main(_):
       pretrained_model=FLAGS.pretrained_model,
       from_distilled_student=FLAGS.from_distilled_student
   )
-
   # If TPU is not available, this will fall back to normal Estimator on CPU
   # or GPU.
   estimator = tf.estimator.tpu.TPUEstimator(
@@ -409,7 +398,6 @@ def main(_):
       train_batch_size=FLAGS.train_batch_size,
       eval_batch_size=FLAGS.eval_batch_size,
       predict_batch_size=FLAGS.eval_batch_size)
-
 
   if FLAGS.do_train:
     tf.logging.info("***** Running training *****")
@@ -428,8 +416,6 @@ def main(_):
   if FLAGS.do_eval:
     tf.logging.info("***** Running evaluation on the test set*****")
     tf.logging.info("  Batch size = %d", FLAGS.eval_batch_size)
-
-    max_eval_examples = None
 
     eval_input_fn = input_fn_builder(
       dataset_path=[os.path.join(FLAGS.data_dir, "dataset_test.tfrecord")],
