@@ -1,3 +1,4 @@
+"""Code to train and eval a BERT passage re-ranker on the TREC CAR dataset."""
 
 from __future__ import absolute_import
 from __future__ import division
@@ -8,6 +9,7 @@ import collections
 import numpy as np
 import tensorflow.compat.v1 as tf
 
+# local modules
 from docubert import DocuBERT
 from input_parser import input_fn_builder
 from utils import result_info, relevance_info
@@ -18,16 +20,21 @@ from electra import optimization as electra_optimization
 tf.random.set_random_seed(118)
 np.random.seed(118)
 
-
 flags = tf.flags
 FLAGS = flags.FLAGS
 
-
 ## Required parameters
-flags.DEFINE_boolean(
-  "from_distilled_student", False,
-  "whether the ckpt comes from distilled student"
+
+flags.DEFINE_string(
+  "kd_method", "CE",
+  "which KD method: CE, MSE"
 )
+
+flags.DEFINE_float(
+  "kd_lambda", 0.0,
+  "the interpolation weight lambda, varying from 0.0 to 1.0"
+)
+
 flags.DEFINE_string(
   "pretrained_model", 'bert',
   "which pretrained model: bert, electra"
@@ -90,9 +97,24 @@ flags.DEFINE_string(
     "for the task.")
 
 flags.DEFINE_string(
-    "bert_config_filename", None,
+    "teacher_bert_config_file",
+    "./data/bert/pretrained_models/uncased_L-24_H-1024_A-16/bert_config.json",
     "The config json file corresponding to the pre-trained BERT model. "
     "This specifies the model architecture.")
+
+flags.DEFINE_string(
+    "student_bert_config_file",
+    "./data/bert/pretrained_models/uncased_L-24_H-1024_A-16/bert_config.json",
+    "The config json file corresponding to the pre-trained BERT model. "
+    "This specifies the model architecture.")
+
+flags.DEFINE_string(
+    "teacher_init_checkpoint", None,
+    "Initial checkpoint (usually from a pre-trained BERT model).")
+
+flags.DEFINE_string(
+    "student_init_checkpoint", None,
+    "Initial checkpoint (usually from a pre-trained BERT model).")
 
 # flags.DEFINE_string("task_name", None, "The name of the task to train.")
 
@@ -105,9 +127,6 @@ flags.DEFINE_string(
 
 ## Other parameters
 
-flags.DEFINE_string(
-    "init_checkpoint", None,
-    "Initial checkpoint (usually from a pre-trained BERT model).")
 
 flags.DEFINE_bool(
     "do_lower_case", True,
@@ -181,7 +200,6 @@ flags.DEFINE_integer(
     "num_tpu_cores", 8,
     "Only used if `use_tpu` is True. Total number of TPU cores to use.")
 
-
 if FLAGS.pretrained_model == 'bert':
   from bert import modeling
 elif FLAGS.pretrained_model == 'electra':
@@ -190,14 +208,10 @@ else:
   raise ValueError("Unsupport model: {}".format(FLAGS.pretrained_model))
 
 
-def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
-                 labels, num_labels, use_one_hot_embeddings, num_segments,
-                 aggregation_method,
-                 pretrained_model='bert', from_distilled_student=False,):
-  """Creates a classification model."""
-  scope = ""
-  if from_distilled_student:
-    scope = "student"
+def create_submodel(bert_config, is_training, input_ids, input_mask, segment_ids,
+                    num_segments, num_labels, use_one_hot_embeddings, scope,
+                    aggregation_method, pretrained_model="bert"):
+
   docubert_model = DocuBERT(
     bert_config=bert_config,
     is_training=is_training,
@@ -227,30 +241,96 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
       initializer=tf.truncated_normal_initializer(stddev=0.02))
     output_bias = tf.get_variable(
       "output_bias", [num_labels], initializer=tf.zeros_initializer())
-
-  with tf.variable_scope("loss"):
     if is_training:
       # I.e., 0.1 dropout
       output_layer = tf.nn.dropout(output_layer, keep_prob=0.9)
-    logits = tf.tensordot(output_layer, output_weights, axes=[-1, -1])
-    # logits = tf.matmul(output_layer, output_weights, transpose_b=True)
+    logits = tf.matmul(output_layer, output_weights, transpose_b=True)
     logits = tf.nn.bias_add(logits, output_bias)
+  if scope == "teacher":
+    logits = tf.stop_gradient(logits)   # A teacher is always frozen
 
-    log_probs = tf.nn.log_softmax(logits, axis=-1)
+  return docubert_model, logits
+
+def create_model(kd_method, kd_lambda, aggregation_method, pretrained_model, teacher_bert_config,
+                 student_bert_config, is_training, input_ids,
+                 input_mask, segment_ids, labels, num_labels,
+                 use_one_hot_embeddings, num_segments):
+  """Creates a classification model."""
+
+  teacher_model, teacher_logits = create_submodel(
+    bert_config=teacher_bert_config,
+    is_training=False,
+    input_ids=input_ids,
+    input_mask=input_mask,
+    segment_ids=segment_ids,
+    num_segments=num_segments,
+    num_labels=num_labels,
+    use_one_hot_embeddings=use_one_hot_embeddings,
+    scope="teacher",
+    aggregation_method=aggregation_method,
+    pretrained_model=pretrained_model
+  )
+  student_model, student_logits = create_submodel(
+    bert_config=student_bert_config,
+    is_training=is_training,
+    input_ids=input_ids,
+    input_mask=input_mask,
+    segment_ids=segment_ids,
+    num_segments=num_segments,
+    num_labels=num_labels,
+    use_one_hot_embeddings=use_one_hot_embeddings,
+    scope="student",
+    aggregation_method=aggregation_method,
+    pretrained_model=pretrained_model
+  )
+
+  with tf.variable_scope("loss"):
+    # general part
+    temperature = 1.0
+    if is_training and kd_method == "CE":
+      temperature = 10.0
+      teacher_logits = teacher_logits / temperature
+      student_logits = student_logits / temperature
+    student_log_probs = tf.nn.log_softmax(student_logits, axis=-1)
+    # teacher_log_probs = tf.nn.log_softmax(teacher_logits, axis=-1)
+    teacher_probs = tf.nn.softmax(teacher_logits, axis=-1)
+
     one_hot_labels = tf.one_hot(labels, depth=num_labels, dtype=tf.float32)
-    per_example_loss = -tf.reduce_sum(one_hot_labels * log_probs, axis=-1)
-    loss = tf.reduce_mean(per_example_loss)
+    per_example_loss = -tf.reduce_sum(one_hot_labels * student_log_probs, axis=-1)
+    # loss = tf.reduce_mean(per_example_loss)
+    loss_CE = tf.nn.softmax_cross_entropy_with_logits_v2(one_hot_labels, student_logits)
+    loss_CE = tf.reduce_mean(loss_CE)
 
-    return (loss, per_example_loss, log_probs)
+    # KD part
+    # pred part
+
+    loss_KD = None
+    if kd_method == 'CE':
+      loss_pred = tf.nn.softmax_cross_entropy_with_logits_v2(teacher_probs, student_logits)
+      loss_pred = tf.reduce_mean(loss_pred)
+      loss_KD = loss_pred
+    elif kd_method == 'MSE':
+      loss_pred = tf.losses.mean_squared_error(teacher_logits, student_logits)
+      loss_KD = loss_pred
+    elif kd_method == "NONE":
+      loss_KD = 0.0
+    else:
+      raise ValueError("Un-supported KD method")
+
+    # finally
+    loss = kd_lambda * loss_CE + (1.0 - kd_lambda) * tf.square(temperature) * loss_KD
+
+    return (loss, per_example_loss, student_log_probs)
 
 
-def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
+def model_fn_builder(kd_method, kd_lambda, aggregation_method, pretrained_model,
+                     teacher_bert_config, student_bert_config, num_labels,
+                     teacher_init_checkpoint, student_init_checkpoint, learning_rate,
                      num_train_steps, num_warmup_steps, use_tpu,
-                     use_one_hot_embeddings, aggregation_method,
-                     pretrained_model, from_distilled_student):
+                     use_one_hot_embeddings):
   """Returns `model_fn` closure for TPUEstimator."""
 
-  def model_fn(features, labels, mode, params):
+  def model_fn(features, labels, mode, params):  # pylint: disable=unused-argument
     """The `model_fn` for TPUEstimator."""
 
     tf.logging.info("*** Features ***")
@@ -266,28 +346,44 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
 
     is_training = (mode == tf.estimator.ModeKeys.TRAIN)
     (total_loss, per_example_loss, log_probs) = create_model(
-        bert_config, is_training, input_ids, input_mask, segment_ids, label_ids,
-        num_labels, use_one_hot_embeddings, num_segments, aggregation_method,
-        pretrained_model, from_distilled_student)
+        kd_method, kd_lambda, aggregation_method,
+        pretrained_model, teacher_bert_config, student_bert_config,
+        is_training, input_ids, input_mask, segment_ids, label_ids,
+        num_labels, use_one_hot_embeddings, num_segments)
 
-    tvars = tf.trainable_variables()
+    teacher_tvars = tf.trainable_variables("teacher/")
+    student_tvars = tf.trainable_variables("student/")
 
     scaffold_fn = None
     initialized_variable_names = []
-    if init_checkpoint:
-      (assignment_map, initialized_variable_names
-      ) = modeling.get_assignment_map_from_checkpoint(tvars, init_checkpoint)
+    # student_prefix = "student/"
+    # if FLAGS.from_distilled_student:
+    #   student_prefix = ""
+    if teacher_init_checkpoint and student_init_checkpoint:
+      (student_assignment_map, student_initialized_variable_names
+       ) = modeling.get_assignment_map_from_checkpoint(
+        student_tvars, student_init_checkpoint, prefix="student/")
+      (teacher_assignment_map, teacher_initialized_variable_names
+      ) = modeling.get_assignment_map_from_checkpoint(
+        teacher_tvars, teacher_init_checkpoint, prefix="teacher/")
+      initialized_variable_names.extend(teacher_initialized_variable_names)
+      initialized_variable_names.extend(student_initialized_variable_names)
+      print(student_assignment_map)
+      print(teacher_assignment_map)
       if use_tpu:
+
         def tpu_scaffold():
-          tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
+          tf.train.init_from_checkpoint(teacher_init_checkpoint, teacher_assignment_map)
+          tf.train.init_from_checkpoint(student_init_checkpoint, student_assignment_map)
           return tf.train.Scaffold()
 
         scaffold_fn = tpu_scaffold
       else:
-        tf.train.init_from_checkpoint(init_checkpoint, assignment_map)
+        tf.train.init_from_checkpoint(teacher_init_checkpoint, teacher_assignment_map)
+        tf.train.init_from_checkpoint(student_init_checkpoint, student_assignment_map)
 
     tf.logging.info("**** Trainable Variables ****")
-    for var in tvars:
+    for var in tf.trainable_variables():
       init_string = ""
       if var.name in initialized_variable_names:
         init_string = ", *INIT_FROM_CKPT*"
@@ -302,9 +398,11 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
     output_spec = None
     if mode == tf.estimator.ModeKeys.TRAIN:
       train_op = optimization.create_optimizer(
-          total_loss, learning_rate, num_train_steps,
-          num_warmup_steps=num_warmup_steps, use_tpu=use_tpu
+        total_loss, learning_rate, num_train_steps,
+        num_warmup_steps=num_warmup_steps, use_tpu=use_tpu,
+        trainable_variable_scope="student/"
       )
+
       output_spec = tf.estimator.tpu.TPUEstimatorSpec(
           mode=mode,
           loss=total_loss,
@@ -317,6 +415,8 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
           predictions={
               "log_probs": log_probs,
               "label_ids": label_ids,
+              # "reduce_all_cls_probs": reduce_all_cls_probs
+              # "len_gt_titles": len_gt_titles,
           },
           scaffold_fn=scaffold_fn)
 
@@ -329,21 +429,20 @@ def model_fn_builder(bert_config, num_labels, init_checkpoint, learning_rate,
   return model_fn
 
 
-
-
 def main(_):
   tf.logging.set_verbosity(tf.logging.INFO)
   
   if not FLAGS.do_train and not FLAGS.do_eval:
     raise ValueError("At least one of `FLAGS.do_train` or `FLAGS.do_eval` must be True.")
 
-  bert_config = modeling.BertConfig.from_json_file(FLAGS.bert_config_filename)
+  teacher_bert_config = modeling.BertConfig.from_json_file(FLAGS.teacher_bert_config_file)
+  student_bert_config = modeling.BertConfig.from_json_file(FLAGS.student_bert_config_file)
 
-  if FLAGS.max_seq_length > bert_config.max_position_embeddings:
+  if FLAGS.max_seq_length > teacher_bert_config.max_position_embeddings:
     raise ValueError(
         "Cannot use sequence length %d because the BERT model "
         "was only trained up to sequence length %d" %
-        (FLAGS.max_seq_length, bert_config.max_position_embeddings))
+        (FLAGS.max_seq_length, teacher_bert_config.max_position_embeddings))
 
   tpu_cluster_resolver = None
   if FLAGS.use_tpu and FLAGS.tpu_name:
@@ -359,8 +458,8 @@ def main(_):
   train_qid_list, test_qid_list = sorted(train_qid_list), sorted(test_qid_list)
   relevance_dict = relevance_info.create_relevance(FLAGS.trec_run_filename, FLAGS.qrels_filename)
   tf.logging.info("Running on dataset: {0}, on fold {1}".format(FLAGS.dataset, FLAGS.fold))
-  tf.logging.info("Traing on the following qids: {0}\n".format(train_qid_list))
-  tf.logging.info("Testing on the following qids: {0}\n".format(test_qid_list))
+  tf.logging.info("Traing on following qid: {0}\n".format(train_qid_list))
+  tf.logging.info("Testing on following qid: {0}\n".format(test_qid_list))
   if FLAGS.num_train_steps:
     num_train_steps = FLAGS.num_train_steps
   else:
@@ -369,7 +468,7 @@ def main(_):
     num_train_steps = FLAGS.num_train_epochs * num_train_queries * FLAGS.max_num_train_instance_perquery
     num_train_steps = num_train_steps / FLAGS.train_batch_size
     # we'd also like it to be a multiple of thousands
-    num_train_steps = int(num_train_steps//1000*1000)
+    num_train_steps = int(num_train_steps // 1000 * 1000)
   num_warmup_steps = int(num_train_steps * FLAGS.warmup_proportion)
   tf.logging.info("Number of training steps: {}".format(num_train_steps))
   tf.logging.info("Number of warmup steps: {}".format(num_warmup_steps))
@@ -380,24 +479,26 @@ def main(_):
       cluster=tpu_cluster_resolver,
       model_dir=FLAGS.output_dir,
       save_checkpoints_steps=FLAGS.save_checkpoints_steps,
-      keep_checkpoint_max=1,
       tpu_config=tf.estimator.tpu.TPUConfig(
           iterations_per_loop=FLAGS.iterations_per_loop,
           num_shards=FLAGS.num_tpu_cores,
           per_host_input_for_training=is_per_host))
 
   model_fn = model_fn_builder(
-      bert_config=bert_config,
+      kd_method=FLAGS.kd_method,
+      kd_lambda=FLAGS.kd_lambda,
+      aggregation_method=FLAGS.aggregation_method,
+      pretrained_model=FLAGS.pretrained_model,
+      teacher_bert_config=teacher_bert_config,
+      student_bert_config=student_bert_config,
       num_labels=2,
-      init_checkpoint=FLAGS.init_checkpoint,
+      student_init_checkpoint=FLAGS.student_init_checkpoint,
+      teacher_init_checkpoint=FLAGS.teacher_init_checkpoint,
       learning_rate=FLAGS.learning_rate,
       num_train_steps=num_train_steps,
       num_warmup_steps=num_warmup_steps,
       use_tpu=FLAGS.use_tpu,
-      use_one_hot_embeddings=FLAGS.use_tpu,
-      aggregation_method=FLAGS.aggregation_method,
-      pretrained_model=FLAGS.pretrained_model,
-      from_distilled_student=FLAGS.from_distilled_student
+      use_one_hot_embeddings=FLAGS.use_tpu
   )
 
   # If TPU is not available, this will fall back to normal Estimator on CPU
@@ -443,6 +544,12 @@ def main(_):
     result = estimator.predict(input_fn=eval_input_fn,
                                yield_single_examples=True)
     results = []
+    # iii = 0
+    # for item in result:
+    #   if iii % 100 == 0:
+    #     print(item["reduce_all_cls_probs"][:12])
+    #   iii += 1
+    # assert 1==4
     for item in result:
       results.append(
         (item["log_probs"], item["label_ids"]))
@@ -450,7 +557,7 @@ def main(_):
     log_probs = np.stack(log_probs).reshape(-1, 2)
     scores = log_probs[:, 1]
     tf.logging.set_verbosity(tf.logging.INFO)
-    tf.logging.info("Number of probs: {}".format(len(log_probs)))
+    tf.logging.info("num of probs: {}".format(len(log_probs)))
 
     result_info.write_result_from_score(
       rerank_topk=FLAGS.rerank_threshold,

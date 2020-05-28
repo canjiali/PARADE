@@ -30,7 +30,7 @@ import tensorflow.compat.v1 as tf
 def create_optimizer(
     loss, learning_rate, num_train_steps, weight_decay_rate=0.0, use_tpu=False,
     num_warmup_steps=0, warmup_proportion=0, lr_decay_power=1.0,
-    layerwise_lr_decay_power=-1, n_transformer_layers=None):
+    layerwise_lr_decay_power=-1, n_transformer_layers=None, trainable_variable_scope=""):
   """Creates an optimizer and training op."""
   global_step = tf.train.get_or_create_global_step()
   learning_rate = tf.train.polynomial_decay(
@@ -57,7 +57,7 @@ def create_optimizer(
   if use_tpu:
     optimizer = tf.tpu.CrossShardOptimizer(optimizer)
 
-  tvars = tf.trainable_variables()
+  tvars = tf.trainable_variables(trainable_variable_scope)
   grads = tf.gradients(loss, tvars)
   (grads, _) = tf.clip_by_global_norm(grads, clip_norm=1.0)
   train_op = optimizer.apply_gradients(
