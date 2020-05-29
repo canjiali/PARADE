@@ -114,7 +114,7 @@ def create_relevance(result_filename, qrels_filename):
   if qrels_filename is not None:
     qrels_relevance_dict = update_qrels_from_res_and_qrels(qrels_filename, res_relevance_dict)
     # some qids don't have qrels, thus can be ignored
-    qid_list = qrels_relevance_dict.keys()
+    # qid_list = qrels_relevance_dict.keys()
 
   for qid in qid_list:
     supervised_docno_list, supervised_score_list = res_relevance_dict.get(qid)
