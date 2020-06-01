@@ -209,8 +209,7 @@ else:
 def create_submodel(bert_config, is_training, input_ids, input_mask, segment_ids,
                     num_segments, num_labels, use_one_hot_embeddings, scope,
                     aggregation_method, pretrained_model="bert"):
-
-  docubert_model = Parade(
+  parade_model = Parade(
     bert_config=bert_config,
     is_training=is_training,
     input_ids=input_ids,
@@ -223,19 +222,19 @@ def create_submodel(bert_config, is_training, input_ids, input_mask, segment_ids
   )
   output_layer = None
   if aggregation_method == 'cls_wAvgP':
-    output_layer = docubert_model.reduced_by_wAvgP()
+    output_layer = parade_model.reduced_by_wAvgP()
   elif aggregation_method == 'cls_avgP':
-    output_layer = docubert_model.reduced_by_avgP()
+    output_layer = parade_model.reduced_by_avgP()
   elif aggregation_method == 'cls_maxP':
-    output_layer = docubert_model.reduced_by_maxP()
+    output_layer = parade_model.reduced_by_maxP()
   elif aggregation_method == 'cls_transformer':
-    output_layer = docubert_model.reduced_by_transformer(is_training, num_transformer_layers=2)
+    output_layer = parade_model.reduced_by_transformer(is_training, num_transformer_layers=2)
   else:
     raise ValueError("Un-supported model type: {}".format(aggregation_method))
 
   with tf.variable_scope(scope):
     output_weights = tf.get_variable(
-      "output_weights", [num_labels, docubert_model.hidden_size],
+      "output_weights", [num_labels, parade_model.hidden_size],
       initializer=tf.truncated_normal_initializer(stddev=0.02))
     output_bias = tf.get_variable(
       "output_bias", [num_labels], initializer=tf.zeros_initializer())
@@ -247,7 +246,7 @@ def create_submodel(bert_config, is_training, input_ids, input_mask, segment_ids
   if scope == "teacher":
     logits = tf.stop_gradient(logits)   # A teacher is always frozen
 
-  return docubert_model, logits
+  return parade_model, logits
 
 def create_model(kd_method, kd_lambda, aggregation_method, pretrained_model, teacher_bert_config,
                  student_bert_config, is_training, input_ids,
