@@ -8,7 +8,7 @@ import collections
 import numpy as np
 import tensorflow.compat.v1 as tf
 
-from docubert import DocuBERT
+from parade import Parade
 from input_parser import input_fn_builder
 from utils import result_info, relevance_info
 from utils.fold_config import FOLD_CONFIG_DICT
@@ -193,7 +193,7 @@ def create_model(bert_config, is_training, input_ids, input_mask, segment_ids,
   scope = ""
   if from_distilled_student:
     scope = "student"
-  docubert_model = DocuBERT(
+  docubert_model = Parade(
     bert_config=bert_config,
     is_training=is_training,
     input_ids=input_ids,

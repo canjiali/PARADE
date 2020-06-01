@@ -10,7 +10,7 @@ import numpy as np
 import tensorflow.compat.v1 as tf
 
 # local modules
-from docubert import DocuBERT
+from parade import Parade
 from input_parser import input_fn_builder
 from utils import result_info, relevance_info
 from utils.fold_config import FOLD_CONFIG_DICT
@@ -210,7 +210,7 @@ def create_submodel(bert_config, is_training, input_ids, input_mask, segment_ids
                     num_segments, num_labels, use_one_hot_embeddings, scope,
                     aggregation_method, pretrained_model="bert"):
 
-  docubert_model = DocuBERT(
+  docubert_model = Parade(
     bert_config=bert_config,
     is_training=is_training,
     input_ids=input_ids,

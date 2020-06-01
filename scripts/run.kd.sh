@@ -11,10 +11,10 @@ export learning_rate=3e-6
 export epoch=3
 
 
-student_BERT_config=gs://canjiampii/checkpoint/uncased_L-10_H-768_A-12_medium_10_base/bert_config.json
+student_BERT_config=gs://Your_gs_bucket/checkpoint/uncased_L-10_H-768_A-12_medium_10_base/bert_config.json
 teacher_BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json
-student_BERT_ckpt_parent=gs://canjiampii/checkpoint/bert_small_onRobust04
-teacher_BERT_ckpt_parent=gs://canjiampii/adhoc/experiment/robust04/title/num-segment-16/bertbase_onMSMARCO_cls_transformer
+student_BERT_ckpt_parent=gs://Your_gs_bucket/checkpoint/bert_small_onRobust04
+teacher_BERT_ckpt_parent=gs://Your_gs_bucket/adhoc/experiment/robust04/title/num-segment-16/bertbase_onMSMARCO_cls_transformer
 
 
 #MSE CE 
@@ -24,8 +24,8 @@ runid=base_to_small_kd-${kd_method}_lambda-${kd_lambda}_lr-${learning_rate}
 
 for fold in {1..5}
 do
-  export data_dir="gs://canjiampii/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
-  export output_dir="gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid/fold-$fold"
+  export data_dir="gs://Your_gs_bucket/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
+  export output_dir="gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid/fold-$fold"
   export teacher_BERT_ckpt=${student_BERT_parent}/fold-${fold}/model.ckpt-18000
   export student_BERT_ckpt=${student_BERT_parent}/fold-${fold}/final
 
@@ -60,7 +60,7 @@ do
 done
 delete_tpu ${tpu_name}
 
-gs_dir=gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid
+gs_dir=gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid
 local_dir=/data2/$dataset/reruns/$field/num-segment-${num_segment}/KD/$runid
 qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.txt
 

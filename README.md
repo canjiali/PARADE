@@ -1,27 +1,27 @@
-# transformers_ranking
+# PARADE
 
 ## Introduction
-DocuBERT is a document re-ranking model based on the pre-trained language models.
-This repo contains the code to reproduce DocuBERT.
+PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document re-ranking model based on the pre-trained language models.
+This repo contains the code to reproduce PARADE.
 
-We support the following DocuBERT variants:
-- DocuBERT-AvgP (named `cls_avgP` in the code)
-- DocuBERT-wAvgP (named `cls_wAvgP` in the code)
-- DocuBERT-MaxP (namded `cls_maxP` in the code)
-- DocuBERT-Transformer (namded `cls_transformer` in the code)
+We support the following PARADE variants:
+- PARADE-AvgP (named `cls_avgP` in the code)
+- PARADE-wAvgP (named `cls_wAvgP` in the code)
+- PARADE-MaxP (namded `cls_maxP` in the code)
+- PARADE-Transformer (namded `cls_transformer` in the code)
 
-We support two pre-trained model instantiations:
+We support two instantiations of pre-trained models:
 - BERT
 - ELECTRA
 
 ## Getting Started
-To run DocuBERT, there're three steps ahead.
-We give a detailed example on Robust04 dataset using the title query.
+To run PARADE, there're three steps ahead.
+We give a detailed example on how to run the code the Robust04 dataset using the title query.
 
 ### 1. Data Preparation
 We need to split the documets into passages, write them into TFrecord files.
 Data for 5 folds are required here.
-The standard `qrels`, `query`, `trec_run` files can be fulfilled by [Anserini](https://github.com/castorini/anserini),
+The standard `qrels`, `query`, `trec_run` files can be accomplished by [Anserini](https://github.com/castorini/anserini),
 please check out their notebook for further details.
 The `corpus` file can also be extarcted by Anserini to form the `docno \t content` paired text.
 
@@ -54,7 +54,7 @@ do
     --rerank_threshold=$rerank_threshold 
 done
 ```
-You should be able to see 5 sub-folders in the `output_dir` folder,
+You should be able to see 5 sub-folders generated in the `output_dir` folder,
 with each contains a train file and a test file.
 Note that if you're going to run the code on TPU, you need to upload the training/testing data to Google Cloud Storage(GCS).
 
@@ -80,7 +80,7 @@ Everything is prepared now!
 For all the pra-trained models, we first fine-tune them on the MSMARCO passage collection.
 This is IMPORTANT, as it can improve the nDCG@20 by 2 points generally.
 To figure out the way of doing that, please check out [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
-The fine-tuned model will be the initialized model in DocuBERT.
+The fine-tuned model will be the initialized model in PARADE.
 Just pass it to the `BERT_ckpt` argument in the following snippet. 
 
 
@@ -95,15 +95,14 @@ export rerank_threshold=100
 export learning_rate=3e-6
 export epoch=1
 
-#export BERT_ckpt=gs://canjiampii/checkpoint/bertbase_msmarco/bert_model.ckpt
 export BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json 
-export BERT_ckpt=gs://canjiampii/experiment/vanilla_electra_base_onMSMARCO/model.ckpt-400000
+export BERT_ckpt="Your_path_to_the_pretrain_ckpt"
 export runid=electra_base_onMSMARCO_${method}
 
 for fold in {1..5}
 do
-  export data_dir="gs://canjiampii/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
-  export output_dir="gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid/fold-$fold"
+  export data_dir="gs://Your_gs_bucket/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
+  export output_dir="gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid/fold-$fold"
 
   python3 -u run_reranking.py \
     --pretrained_model=electra \
@@ -134,7 +133,7 @@ done
 The 5-fold training/testing are done now.
 Next you need to download the resutls from GCS, then merge them, and evaluate them!
 ```bash
-gs_dir=gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid
+gs_dir=gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid
 local_dir=/data2/$dataset/reruns/$field/num-segment-${num_segment}/$runid
 qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.txt
 mkdir -p $local_dir
@@ -158,7 +157,7 @@ cat ${local_dir}/fold_*epoch_${epoch}_bert_predictions_test.txt >> ${local_dir}/
 /data/tool/trec_eval-9.0.7/trec_eval ${qrels_path} ${local_dir}/merge_epoch${epoch} -m ndcg_cut.20 -m P.20  >> ${local_dir}/result_epoch${epoch}
 cat ${local_dir}/result_epoch${epoch}
 ```
-The model performance will automatically output on yor screen. On Robust04 title using DocuBERT-Transformer(ELECTRA), we get 
+The model performance will automatically output on yor screen. On Robust04 title using PARADE(ELECTRA), we get 
 ```
 P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
@@ -168,7 +167,7 @@ The above steps can also be done all at once by running `scripts/run.reranking.s
 
 ### 3. Significance Test
 To do a significance test, just configurate the `trec_eval` path in the `evaluation.py` file. 
-Then simply run the following command, here we compare DocuBERT with BERT-MaxP:
+Then simply run the following command, here we compare PARADE with BERT-MaxP:
 ```
 python evaluation.py \
   --qrels /data/anserini/src/main/resources/topics-and-qrels/qrels.robust04.txt \
@@ -183,10 +182,10 @@ OrderedDict([('P_20', 1.2993259211924425e-11), ('ndcg_cut_20', 8.306604295574242
 ```
 The upper two lines are the sanity checks of your run performance values.
 The last line represents the p-values.
-DocuBERT achieves significant improvement over BERT-MaxP (p < 0.01) !
+PARADE achieves significant improvement over BERT-MaxP (p < 0.01) !
 
 ### Knowledge Distillation (Optional)
-You can also perform knowledge distillation for the smaller DocuBERT models.
+You can also perform knowledge distillation for the smaller PARADE models.
 Please follow the above steps to fine-tune the smaller models first.
 Then run the following command:
 ```bash
@@ -199,10 +198,10 @@ export rerank_threshold=100
 export learning_rate=3e-6
 export epoch=3
 
-student_BERT_config=gs://canjiampii/checkpoint/uncased_L-10_H-768_A-12_medium_10_base/bert_config.json
+student_BERT_config=gs://Your_gs_bucket/checkpoint/uncased_L-4_H-512_A-8_small/bert_config.json
 teacher_BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json
-student_BERT_ckpt_parent=gs://canjiampii/checkpoint/bert_small_onRobust04
-teacher_BERT_ckpt_parent=gs://canjiampii/adhoc/experiment/robust04/title/num-segment-16/bertbase_onMSMARCO_cls_transformer
+student_BERT_ckpt_parent=gs://Your_gs_bucket/checkpoint/bert_small_onRobust04
+teacher_BERT_ckpt_parent=gs://Your_gs_bucket/adhoc/experiment/robust04/title/num-segment-16/bertbase_onMSMARCO_cls_transformer
 
 #MSE CE 
 kd_method=MSE
@@ -211,8 +210,8 @@ runid=base_to_small_kd-${kd_method}_lambda-${kd_lambda}_lr-${learning_rate}
 
 for fold in {1..5}
 do
-  export data_dir="gs://canjiampii/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
-  export output_dir="gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid/fold-$fold"
+  export data_dir="gs://Your_gs_bucket/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
+  export output_dir="gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid/fold-$fold"
   export teacher_BERT_ckpt=${student_BERT_parent}/fold-${fold}/model.ckpt-18000
   export student_BERT_ckpt=${student_BERT_parent}/fold-${fold}/final
 
@@ -246,14 +245,14 @@ do
     --tpu_name=$tpu_name 
 done
 
-gs_dir=gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid
+gs_dir=gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/KD/$runid
 local_dir=/data2/$dataset/reruns/$field/num-segment-${num_segment}/KD/$runid
 qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.txt
 
 ./scripts/download_and_evaluate.sh  ${gs_dir} ${local_dir} ${qrels_path} ${epoch} 
 ```
 The script also lies in `scripts/run.kd.sh`.
-It outputs the following results for DocuBERT using BERT-small with only 4 layers!
+It outputs the following results for PARADE using BERT-small with only 4 layers!
 ```bash
 P_20                    all     0.4365
 ndcg_cut_20             all     0.5098

@@ -7,7 +7,7 @@ modeling_dict = {
   'bert': bert_modeling,
   'electra': electra_modeling
 }
-class DocuBERT(object):
+class Parade(object):
   def __init__(self, bert_config, is_training, input_ids, input_mask, segment_ids,
                num_segments, pretrained_model='bert', use_one_hot_embeddings=True,
                scope=""):
@@ -119,7 +119,7 @@ class DocuBERT(object):
     attention_mask = tf.sequence_mask(self.num_segments+1, self.max_num_segments_perdoc+1, dtype=tf.float32)
     attention_mask = tf.tile(tf.expand_dims(attention_mask, axis=1), [1, self.max_num_segments_perdoc+1, 1])
     with tf.variable_scope(self.scope):
-      with tf.variable_scope("docubert_transformer"):
+      with tf.variable_scope("parade_transformer"):
         if not is_training:
           bert_config.hidden_dropout_prob = 0.0
           bert_config.attention_probs_dropout_prob = 0.0

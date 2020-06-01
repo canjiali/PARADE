@@ -11,15 +11,15 @@ export rerank_threshold=100
 export learning_rate=3e-6
 export epoch=3
 
-#export BERT_ckpt=gs://canjiampii/checkpoint/bertbase_msmarco/bert_model.ckpt
+#export BERT_ckpt=gs://Your_gs_bucket/checkpoint/bertbase_msmarco/bert_model.ckpt
 export BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json 
-export BERT_ckpt=gs://canjiampii/experiment/vanilla_electra_base_onMSMARCO/model.ckpt-400000
+export BERT_ckpt=gs://Your_gs_bucket/experiment/vanilla_electra_base_onMSMARCO/model.ckpt-400000
 export runid=testcode_electra_base_onMSMARCO_${method}
 
 for fold in {1..5}
 do
-  export data_dir="gs://canjiampii/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
-  export output_dir="gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid/fold-$fold"
+  export data_dir="gs://Your_gs_bucket/adhoc/training.data/$dataset/$field/num-segment-${num_segment}/fold-$fold-train-$max_num_train_instance_perquery-test-$rerank_threshold"
+  export output_dir="gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid/fold-$fold"
 
   python3 -u run_reranking.py \
     --pretrained_model=electra \
@@ -48,7 +48,7 @@ do
 done
 delete_tpu ${tpu_name}
 
-gs_dir=gs://canjiampii/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid
+gs_dir=gs://Your_gs_bucket/adhoc/experiment/$dataset/$field/num-segment-${num_segment}/$runid
 local_dir=/data2/$dataset/reruns/$field/num-segment-${num_segment}/$runid
 qrels_path=/data/anserini/src/main/resources/topics-and-qrels/qrels.${dataset}.txt
 
