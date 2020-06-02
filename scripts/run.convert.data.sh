@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/bash -xe
 
 export max_num_train_instance_perquery=1000
-export rerank_threshold=1000
+export rerank_threshold=100
 export BERT_PRETRAINED_DIR="gs://cloud-tpu-checkpoints/bert"
 export num_segment=16
 
@@ -10,7 +10,7 @@ do
   export output_dir=/data2/robust04/runs/title/training.data/num-segment-${num_segment}/fold-${fold}-train-${max_num_train_instance_perquery}-test-${rerank_threshold}
   mkdir -p $output_dir 
 
-  python3 generate_training_pair_v2.py \
+  python3 -u generate_data.py \
     --trec_run_filename=/data2/robust04/runs/title/run.robust04.title.bm25.txt \
     --qrels_filename=/data/anserini/src/main/resources/topics-and-qrels/qrels.robust04.txt \
     --query_filename=/data/anserini/src/main/resources/topics-and-qrels/topics.robust04.txt \
