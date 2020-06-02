@@ -66,9 +66,10 @@ then re-build Anserini.
 Below is how we fetch the raw text
 ```bash
 anserini_path="path_to_anserini"
+index_path="path_to_index"
 # say you're given a BM25 run file run.BM25.txt
 cut -d ' ' -f3 run.BM25.txt | sort | uniq > docnolist
-${anserini_path}/target/appassembler/bin/IndexUtils -dumpTransformedDocBatch docnolist
+${anserini_path}/target/appassembler/bin/IndexUtils -dumpTransformedDocBatch docnolist -index ${index_path}
 ```
 then you get the required raw text in the same directory of docnolist. 
 Everything is prepared now!
@@ -93,7 +94,7 @@ export num_segment=16
 export max_num_train_instance_perquery=1000
 export rerank_threshold=100
 export learning_rate=3e-6
-export epoch=1
+export epoch=3
 
 export BERT_config=gs://cloud-tpu-checkpoints/bert/uncased_L-12_H-768_A-12/bert_config.json 
 export BERT_ckpt="Your_path_to_the_pretrain_ckpt"
