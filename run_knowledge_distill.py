@@ -1,4 +1,3 @@
-"""Code to train and eval a BERT passage re-ranker on the TREC CAR dataset."""
 
 from __future__ import absolute_import
 from __future__ import division
