@@ -84,7 +84,7 @@ To figure out the way of doing that, please check out [dl4marco-bert](https://gi
 The fine-tuned model will be the initialized model in PARADE.
 Just pass it to the `BERT_ckpt` argument in the following snippet. 
 
-
+For running 5-fold cross validation, you can check the fold configuration here at `utils/fold_config.py`.
 ```bash
 export method=cls_transformer
 export tpu_name=node-5
