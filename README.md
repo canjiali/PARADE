@@ -1,5 +1,24 @@
 # PARADE
 
+## For COVID-19 only
+#### convert data
+If you want to do a 5-fold cross validatoin, set `do_fold_training=True`;
+otherwise you want to train on a list of qids and evaluate on a list of other qids (though there exist some overlap),
+you set `do_fold_training=False` and configure the `used_qid_list` argument.
+You're supposed to run this script twice, because for training and evaluation, 
+the `trec_run_filename`, `corpus_filename` should be different, as well as the `used_qid_list`.
+You set `convert_train=True` to convert training while `convert_test=True` for evaluation. 
+DON'T do them at the same time.
+
+#### run training and evaluation
+Again if you want to do 5-fold cross validatoin, set `do_fold_training=True`;
+otherwise you want to train on a list of qids and evaluate a list of other qids (though there exist some overlap),
+you set `do_fold_training=False` and configure the `used_qid_list` argument.
+The `used_qid_list` should be the same as your `used_qid_list` when you're converting evaluation data.
+
+Both scripts are in `scripts/run.convert.data.sh` and `scripts/run.reranking.sh`.
+
+
 ## Introduction
 PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document re-ranking model based on the pre-trained language models.
 This repo contains the code to reproduce PARADE.

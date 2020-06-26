@@ -22,6 +22,16 @@ flags = tf.flags
 FLAGS = flags.FLAGS
 
 ## Required parameters
+flags.DEFINE_bool(
+  "do_fold_training", False,
+  "whether to run 5 fold cross validatoin"
+)
+
+flags.DEFINE_list(
+  "used_qid_list", [-1],
+  "a useful qid list for converting data"
+)
+
 flags.DEFINE_boolean(
   "from_distilled_student", False,
   "whether the ckpt comes from distilled student"
@@ -437,11 +447,15 @@ def main(_):
     scores = log_probs[:, 1]
     tf.logging.set_verbosity(tf.logging.INFO)
     tf.logging.info("Number of probs: {}".format(len(log_probs)))
-
+    if FLAGS.do_fold_training:
+      useful_qid_list = test_qid_list
+    else:
+      useful_qid_list = FLAGS.used_qid_list
+    useful_qid_list = list(map(str, useful_qid_list))
     result_info.write_result_from_score(
       rerank_topk=FLAGS.rerank_threshold,
       scores=scores,
-      qid_list=test_qid_list,
+      qid_list=useful_qid_list,
       relevance_dict=relevance_dict,
       write_path=trec_file,
       runid=FLAGS.aggregation_method

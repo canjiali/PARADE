@@ -17,6 +17,26 @@ flags = tf.flags
 FLAGS = flags.FLAGS
 
 ## Required parameters
+flags.DEFINE_bool(
+  "do_fold_training", False,
+  "whether to run 5 fold cross validatoin"
+)
+
+flags.DEFINE_list(
+  "used_qid_list", [-1],
+  "a useful qid list for converting data"
+)
+
+flags.DEFINE_bool(
+  "convert_train", False,
+  "whether to convert training data"
+)
+
+flags.DEFINE_bool(
+  "convert_test", False,
+  "whether to convert test data"
+)
+
 flags.DEFINE_string(
     "trec_run_filename", None,
     "where the trec run file (e.g. produced by BM25) is"
@@ -334,30 +354,42 @@ def main(_):
     do_lower_case=FLAGS.do_lower_case
   )
   # begin data convertion to TFrecord
-  output_path = os.path.join(FLAGS.output_dir, "dataset_train.tfrecord")
-  tf.logging.info("Writing data into {}".format(output_path))
-  writer = tf.python_io.TFRecordWriter(output_path)
-  convert_data_pointwise(
-    writer=writer,
-    tokenizer=tokenizer,
-    qid_list=train_qid_list,
-    relevance_dict=relevance_dict,
-    corpus_dict=corpus_dict,
-    query_dict=query_dict,
-    is_eval=False
-  )
-  output_path = os.path.join(FLAGS.output_dir, "dataset_test.tfrecord")
-  tf.logging.info("Writing data into {}".format(output_path))
-  writer = tf.python_io.TFRecordWriter(output_path)
-  convert_data_pointwise(
-    writer=writer,
-    tokenizer=tokenizer,
-    qid_list=test_qid_list,
-    relevance_dict=relevance_dict,
-    corpus_dict=corpus_dict,
-    query_dict=query_dict,
-    is_eval=True
-  )
+  if FLAGS.convert_train:
+    output_path = os.path.join(FLAGS.output_dir, "dataset_train.tfrecord")
+    tf.logging.info("Writing data into {}".format(output_path))
+    writer = tf.python_io.TFRecordWriter(output_path)
+    if FLAGS.do_fold_training:
+      useful_qid_list = train_qid_list
+    else:
+      useful_qid_list = FLAGS.used_qid_list
+    useful_qid_list = list(map(str, useful_qid_list))
+    convert_data_pointwise(
+      writer=writer,
+      tokenizer=tokenizer,
+      qid_list=useful_qid_list,
+      relevance_dict=relevance_dict,
+      corpus_dict=corpus_dict,
+      query_dict=query_dict,
+      is_eval=False
+    )
+  if FLAGS.convert_test:
+    output_path = os.path.join(FLAGS.output_dir, "dataset_test.tfrecord")
+    tf.logging.info("Writing data into {}".format(output_path))
+    writer = tf.python_io.TFRecordWriter(output_path)
+    if FLAGS.do_fold_training:
+      useful_qid_list = test_qid_list
+    else:
+      useful_qid_list = FLAGS.used_qid_list
+    useful_qid_list = list(map(str, useful_qid_list))
+    convert_data_pointwise(
+      writer=writer,
+      tokenizer=tokenizer,
+      qid_list=useful_qid_list,
+      relevance_dict=relevance_dict,
+      corpus_dict=corpus_dict,
+      query_dict=query_dict,
+      is_eval=True
+    )
 
 
 if __name__ == '__main__':
