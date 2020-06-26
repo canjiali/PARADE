@@ -104,20 +104,13 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
   id_abstract_map = read_meta_file(meta_filename)
   total_tokens = 0
   with open(docid_filename, 'r') as rf, open(output_filename, 'w') as wf:
-    for line in rf:
+    for idx, line in enumerate(rf):
       docid = line.strip()
       doc = searcher.doc(docid)
       lucene_document = doc.lucene_document()
       hit2json = json.loads(doc.raw())
-      # print(lucene_document)
-      # print("=========")
-      # print(hit2json)
-      # print("=========")
-      # print(id_abstract_map[docid])
-      # print("=========")
       title = lucene_document.get('title')
-      abstract = id_abstract_map[docid]
-      # abstract = lucene_document.get('abstract')
+      abstract = id_abstract_map[docid]  # some abstracts are missing from index
       body = []
       if 'body_text' not in hit2json:
         body = ' '
@@ -132,6 +125,7 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
       write_to_text = " ".join([title, abstract, body])
       total_tokens += len(write_to_text.split())
       wf.write("{}\t{}\n".format(docid, write_to_text))
+  logging.info("Average document length: {}".format(total_tokens // (idx+1)))
 
 
 if __name__ == '__main__':
