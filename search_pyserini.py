@@ -100,7 +100,7 @@ def read_meta_file(meta_filename):
 
 
 def fetch_content_from_docid(index_filename, meta_filename, docid_filename, output_filename):
-  searcher = pysearch.SimpleSearcher(index_filename)
+  searcher = SimpleSearcher(index_filename)
   id_abstract_map = read_meta_file(meta_filename)
   total_tokens = 0
   with open(docid_filename, 'r') as rf, open(output_filename, 'w') as wf:
