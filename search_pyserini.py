@@ -102,7 +102,8 @@ def read_meta_file(meta_filename):
 def fetch_content_from_docid(index_filename, meta_filename, docid_filename, output_filename):
   searcher = SimpleSearcher(index_filename)
   id_abstract_map = read_meta_file(meta_filename)
-  total_tokens = 0
+  count_tokens = 0
+  count_from_meta = 0
   with open(docid_filename, 'r') as rf, open(output_filename, 'w') as wf:
     for idx, line in enumerate(rf):
       docid = line.strip()
@@ -110,7 +111,10 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
       lucene_document = doc.lucene_document()
       hit2json = json.loads(doc.raw())
       title = lucene_document.get('title')
-      abstract = id_abstract_map[docid]  # some abstracts are missing from index
+      abstract = lucene_document.get('abstract')
+      if abstract.strip() == "" and docid in id_abstract_map.keys():
+        abstract = id_abstract_map[docid]  # some abstracts are missing from index
+        count_from_meta += 1
       body = []
       if 'body_text' not in hit2json:
         body = ' '
@@ -123,9 +127,10 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
       abstract = regex.sub(' ', abstract)
       body = regex.sub(' ', body)
       write_to_text = " ".join([title, abstract, body])
-      total_tokens += len(write_to_text.split())
+      count_tokens += len(write_to_text.split())
       wf.write("{}\t{}\n".format(docid, write_to_text))
-  logging.info("Average document length: {}".format(total_tokens // (idx+1)))
+  logging.info("Average document length: {}".format(count_tokens // (idx+1)))
+  logging.info("Reading {} abstracts from meta file".format(count_from_meta))
 
 
 if __name__ == '__main__':
