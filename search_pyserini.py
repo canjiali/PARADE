@@ -136,10 +136,10 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument("index_filename", help="index path")
-  parser.add_argument("meta_filename", help="covid meta filename")
-  parser.add_argument("docid_filename", help="docid path, one docid one line")
-  parser.add_argument("output_filename", help="output path, format: docid \t content")
+  parser.add_argument("--index_filename", help="index path")
+  parser.add_argument("--meta_filename", help="covid meta filename")
+  parser.add_argument("--docid_filename", help="docid path, one docid one line")
+  parser.add_argument("--output_filename", help="output path, format: docid \t content")
   args = parser.parse_args()
   fetch_content_from_docid(
     args.index_filename,
