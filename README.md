@@ -21,6 +21,14 @@ If you're not doing 5-fold cross validation, it'll not take effect.
 
 Both scripts are in `scripts/run.convert.data.sh` and `scripts/run.reranking.sh`.
 
+#### Postprocess
+As required, you need to filter the qid-docid pair that occurs in the previous rounds.
+Please run the following command:
+```
+python3 sanity_check.py \
+  --run run_filename \
+  --qrels qrels_filename
+```
 
 ## Introduction
 PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document re-ranking model based on the pre-trained language models.
