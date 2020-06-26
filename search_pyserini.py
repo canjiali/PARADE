@@ -107,17 +107,17 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
     for line in rf:
       docid = line.strip()
       doc = searcher.doc(docid)
-      lucene_document = doc.lucene_document
+      lucene_document = doc.lucene_document()
       hit2json = json.loads(doc.raw())
-      print(lucene_document)
-      print("=========")
-      print(hit2json)
-      print("=========")
-      print(id_abstract_map[docid])
-      print("=========")
-      assert 1==4
+      # print(lucene_document)
+      # print("=========")
+      # print(hit2json)
+      # print("=========")
+      # print(id_abstract_map[docid])
+      # print("=========")
       title = lucene_document.get('title')
-      abstract = lucene_document.get('abstract')
+      abstract = id_abstract_map[docid]
+      # abstract = lucene_document.get('abstract')
       body = []
       if 'body_text' not in hit2json:
         body = ' '
@@ -131,7 +131,7 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
       body = regex.sub(' ', body)
       write_to_text = " ".join([title, abstract, body])
       total_tokens += len(write_to_text.split())
-      doc_wf.write("{}\t{}\n".format(docid, write_to_text))
+      wf.write("{}\t{}\n".format(docid, write_to_text))
 
 
 if __name__ == '__main__':
