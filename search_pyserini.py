@@ -94,6 +94,7 @@ def read_query(topic_filename, field):
 
 def read_meta_file(meta_filename):
   df = pandas.read_csv(meta_filename, sep=',', header=0)
+  df['abstract'].fillna('', inplace=True)
   id_abstract_map = dict(zip(df.cord_uid, df.abstract))
 
   return id_abstract_map
@@ -114,7 +115,8 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
       abstract = lucene_document.get('abstract')
       if abstract.strip() == "" and docid in id_abstract_map.keys():
         abstract = id_abstract_map[docid]  # some abstracts are missing from index
-        count_from_meta += 1
+        if abstract != "":
+          count_from_meta += 1
       body = []
       if 'body_text' not in hit2json:
         body = ' '
