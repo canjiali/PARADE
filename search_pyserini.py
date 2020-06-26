@@ -5,7 +5,7 @@ import logging
 import argparse
 import collections
 from bs4 import BeautifulSoup
-from pyserini.search import pysearch
+from pyserini.search import SimpleSearcher
 from utils.relevance_info import partition_fold
 
 logging.basicConfig(level=logging.INFO)
@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 def search(index_filename, query_filename, query_field, output_filename, runid, num_hits=1000):
   wf = open(output_filename, 'w')
   doc_wf = open(output_filename+"_rawdocs.txt", 'w')
-  searcher = pysearch.SimpleSearcher(index_filename)
+  searcher = SimpleSearcher(index_filename)
   query_dict = read_query(query_filename, query_field)
   total_tokens = 0
   global_uniq_docids = set()
