@@ -158,7 +158,7 @@ cat ${local_dir}/fold_*epoch_${epoch}_bert_predictions_test.txt >> ${local_dir}/
 /data/tool/trec_eval-9.0.7/trec_eval ${qrels_path} ${local_dir}/merge_epoch${epoch} -m ndcg_cut.20 -m P.20  >> ${local_dir}/result_epoch${epoch}
 cat ${local_dir}/result_epoch${epoch}
 ```
-The model performance will automatically output on yor screen. On Robust04 title using PARADE(ELECTRA), we get 
+The model performance will automatically output on your screen. On Robust04 title using PARADE(ELECTRA), we get 
 ```
 P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
