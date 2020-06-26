@@ -4,6 +4,7 @@ import pandas
 import logging
 import argparse
 import collections
+from tqdm import tqdm
 from bs4 import BeautifulSoup
 from pyserini.search import SimpleSearcher
 from utils.relevance_info import partition_fold
@@ -106,7 +107,7 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
   count_tokens = 0
   count_from_meta = 0
   with open(docid_filename, 'r') as rf, open(output_filename, 'w') as wf:
-    for idx, line in enumerate(rf):
+    for idx, line in enumerate(tqdm(rf)):
       docid = line.strip()
       doc = searcher.doc(docid)
       lucene_document = doc.lucene_document()
