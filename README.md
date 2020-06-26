@@ -16,6 +16,9 @@ otherwise you want to train on a list of qids and evaluate a list of other qids 
 you set `do_fold_training=False` and configure the `used_qid_list` argument.
 The `used_qid_list` should be the same as your `used_qid_list` when you're converting evaluation data.
 
+Please set `dataset` as one of the following: `covid19_r1`, `covid19_r2`.
+If you're not doing 5-fold cross validation, it'll not take effect.
+
 Both scripts are in `scripts/run.convert.data.sh` and `scripts/run.reranking.sh`.
 
 

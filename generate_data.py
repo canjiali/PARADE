@@ -348,7 +348,7 @@ def main(_):
 
   relevance_dict = relevance_info.create_relevance(FLAGS.trec_run_filename, FLAGS.qrels_filename)
   corpus_dict = file_operation.key_value_from_file(FLAGS.corpus_filename)
-  query_dict = file_operation.load_trec_topics(FLAGS.query_filename)[FLAGS.query_field]
+  query_dict = file_operation.load_xml_query(FLAGS.query_filename, FLAGS.query_field)
   tokenizer = tokenization.FullTokenizer(
     vocab_file=FLAGS.vocab_filename,
     do_lower_case=FLAGS.do_lower_case
