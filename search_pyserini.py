@@ -133,6 +133,7 @@ def fetch_content_from_docid(index_filename, meta_filename, docid_filename, outp
       write_to_text = " ".join([title, abstract, body])
       count_tokens += len(write_to_text.split())
       wf.write("{}\t{}\n".format(docid, write_to_text))
+  logging.info("Fetching totally {} lines".format(idx+1))
   logging.info("Average document length: {}".format(count_tokens // (idx+1)))
   logging.info("Reading {} abstracts from meta file".format(count_from_meta))
 
