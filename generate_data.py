@@ -321,8 +321,9 @@ def get_passages(text, plen, overlap):
       s = s + plen - overlap
 
     if len(passages) > FLAGS.max_num_segments_perdoc:
-      chosen_ids = sorted(random.sample(range(1, len(passages) - 1), FLAGS.max_num_segments_perdoc - 2))
-      chosen_ids = [0] + chosen_ids + [len(passages) - 1]
+      # always keep the first 4 segments to cover title+abstract as much as possible
+      chosen_ids = sorted(random.sample(range(4, len(passages) - 1), FLAGS.max_num_segments_perdoc - 5))
+      chosen_ids = list(range(4)) + chosen_ids + [len(passages) - 1]
       passages = [passages[id] for id in chosen_ids]
 
     global stats

@@ -4,11 +4,11 @@
 #### preprocess
 how to get the content
 ```
-python search_pyserini.py   
-  --index_filename /data-crystina/canjia/data/index/lucene-index-cord19-full-text-2020-05-19 
-  --meta_filename /data-crystina/canjia/data/collections/cord19-2020-05-19/metadata.csv  
-  --docid_filename /data-crystina/canjia/data/covid/runs/anserini.covid-r3.fusion2.txt.docid
-  --output_filename /data-crystina/canjia/data/covid/runs/anserini.covid-r3.fusion2.txt.docid_content.txt
+python search_pyserini.py  \ 
+  --index_filename /data-crystina/canjia/data/index/lucene-index-cord19-full-text-2020-05-19 \
+  --meta_filename /data-crystina/canjia/data/collections/cord19-2020-05-19/metadata.csv  \
+  --docid_filename /data-crystina/canjia/data/covid/runs/anserini.covid-r3.fusion2.txt.docid \
+  --output_filename /data-crystina/canjia/data/covid/runs/anserini.covid-r3.fusion2.txt.docid_content.txt 
 ```
 #### convert data
 If you want to do a 5-fold cross validatoin, set `do_fold_training=True`;
