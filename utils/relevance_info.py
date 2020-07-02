@@ -106,7 +106,7 @@ def update_res_relevance(res_file):
   return res_relevance_dict
 
 
-def create_relevance(result_filename, qrels_filename):
+def create_relevance(result_filename, qrels_filename=None):
   relevance_dict = collections.OrderedDict()
   res_relevance_dict = update_res_relevance(result_filename)
   qid_list = res_relevance_dict.keys()
