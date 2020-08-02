@@ -105,7 +105,7 @@ class Parade(object):
     clsid_tf = tf.Variable([CLS_ID], dtype=tf.int32, trainable= False, name='clsid_tf')
     cls_embedding = tf.nn.embedding_lookup(embeddings, clsid_tf)
     cls_embedding_tiled = tf.tile(cls_embedding, multiples=[self.batch_size, 1]) # [B, H]
-    merged_output = tf.concat((output_layer, tf.expand_dims(cls_embedding_tiled, axis=1)), axis=1) # [B, N + 1, H]
+    merged_output = tf.concat((tf.expand_dims(cls_embedding_tiled, axis=1), output_layer), axis=1) # [B, N + 1, H]
     if use_passage_pos_embedding:
       with tf.variable_scope(self.scope):
         full_position_embeddings = tf.get_variable(
