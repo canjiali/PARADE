@@ -1,5 +1,11 @@
 # PARADE
 
+This repository contains the code for our paper
+- PARADE: Passage Representation Aggregation for Document Reranking
+
+If you're interested in how to run PARADE for the TREC-COVID challenge, 
+please check out the `covid` branch.
+
 ## Introduction
 PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document re-ranking model based on the pre-trained language models.
 This repo contains the code to reproduce PARADE.
