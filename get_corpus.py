@@ -31,5 +31,19 @@ def get_corpus(docid_filename, corpus_filename, offset_filename, output_filename
 def main():
   fire.Fire(get_corpus)
 
+def get_avg_doclen(filename):
+  count = 0
+  count_words = 0
+  with open(filename, 'r') as f:
+    for line in f:
+      count += 1
+      docid, content = line.strip().split("\t")
+      _len = len(content.split(" "))
+      count_words += _len
+  print(count)
+  print(count_words)
+  print(count_words // count)
+
+
 if __name__ == '__main__':
   main()
