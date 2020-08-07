@@ -8,7 +8,6 @@ please check out the `covid` branch.
 
 ## Introduction
 PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document re-ranking model based on the pre-trained language models.
-This repo contains the code to reproduce PARADE.
 
 We support the following PARADE variants:
 - PARADE-AvgP (named `cls_avgP` in the code)
@@ -89,6 +88,9 @@ This is IMPORTANT, as it can improve the nDCG@20 by 2 points generally.
 To figure out the way of doing that, please check out [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert).
 The fine-tuned model will be the initialized model in PARADE.
 Just pass it to the `BERT_ckpt` argument in the following snippet. 
+If you want to escape this fine-tuning step,
+checkout thes [models](#resource) already fine-tuned on the MSMARCO passage ranking dataset.
+
 
 For running 5-fold cross validation, you can check the fold configuration here at `utils/fold_config.py`.
 ```bash
@@ -264,3 +266,30 @@ It outputs the following results for PARADE using BERT-small with only 4 layers!
 P_20                    all     0.4365
 ndcg_cut_20             all     0.5098
 ```
+
+### <a name="resource"></a> Useful Resources
+
+- Fine-tuned models on the MSMARCO passage ranking dataset:
+
+| Model        | L / H    | Path |
+|--------------|----------|------|
+| ELECTRA-Base | 12 / 768 |      |
+| BERT-Base    | 12 / 768 |      |
+| \            | 10 / 768 |      |
+| \            | 8 / 768  |      |
+| BERT-Medium  | 8 / 512  |      |
+| BERT-Small   | 4 / 512  |      |
+| BERT-Mini    | 4 / 256  |      |
+| \            | 2 / 512  |      |
+| BERT-Tiny    | 2 /128   |      |
+
+- Our run files on the Robust04 and GOV2 collections: 
+[Robust04](http), 
+[GOV2](http).
+
+### Acknowledgement
+Some snippets of the codes are borrowed from 
+[NPRF](https://github.com/ucasir/NPRF),
+[Capreolus](https://github.com/capreolus-ir/capreolus),
+[dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert),
+[SIGIR19-BERT-IR](https://github.com/AdeDZY/SIGIR19-BERT-IR).
