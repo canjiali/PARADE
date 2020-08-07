@@ -24,7 +24,7 @@ def get_corpus(docid_filename, corpus_filename, offset_filename, output_filename
       docid = line.strip()
       corpus_f.seek(doc_offset[docid])
       doc_info = corpus_f.readline()
-      assert line.startswith(docid + "\t"), 'Looking for {docid}, found {line}'.format(docid=docid, line=line)
+      assert line.startswith(docid), 'Looking for {docid}, found {line}'.format(docid=docid, line=line)
       _, _, title, body = doc_info.split("\t")
       out_f.write("{}\t{}".format(docid, " ".join([title, body])))
 
