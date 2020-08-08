@@ -67,7 +67,7 @@ The above snippet also exists in `scripts/run.convert.data.sh`.
 
 If you bother getting the raw text from Anserini, 
 you can also replace the `anserini/src/main/java/io/anserini/index/IndexUtils.java` file by the `extra/IndexUtils.java` file in this repo,
-then re-build Anserini.
+then re-build Anserini (version 0.7.0).
 Below is how we fetch the raw text
 ```bash
 anserini_path="path_to_anserini"
@@ -77,6 +77,7 @@ cut -d ' ' -f3 run.BM25.txt | sort | uniq > docnolist
 ${anserini_path}/target/appassembler/bin/IndexUtils -dumpTransformedDocBatch docnolist -index ${index_path}
 ```
 then you get the required raw text in the same directory of docnolist. 
+Alternatively, you can refer to the `search_pyserini.py` file in `covid` branch that can easily fetch the docs using pyserini.
 Everything is prepared now!
 
 ### 2. Model Traning and Evaluation
