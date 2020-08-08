@@ -221,11 +221,11 @@ def create_submodel(bert_config, is_training, input_ids, input_mask, segment_ids
   )
   output_layer = None
   if aggregation_method == 'cls_wAvgP':
-    output_layer = parade_model.reduced_by_wAvgP()
+    output_layer = parade_model.reduced_by_attn()
   elif aggregation_method == 'cls_avgP':
-    output_layer = parade_model.reduced_by_avgP()
+    output_layer = parade_model.reduced_by_avg()
   elif aggregation_method == 'cls_maxP':
-    output_layer = parade_model.reduced_by_maxP()
+    output_layer = parade_model.reduced_by_max()
   elif aggregation_method == 'cls_transformer':
     output_layer = parade_model.reduced_by_transformer(is_training, num_transformer_layers=2)
   else:

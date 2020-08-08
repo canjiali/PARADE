@@ -63,7 +63,7 @@ class Parade(object):
     self.hidden_size = self.output_layer.shape[-1].value
 
 
-  def reduced_by_wAvgP(self):
+  def reduced_by_attn(self):
     with tf.variable_scope(self.scope):
       cls_weight = tf.get_variable(
         'cls_weight', shape=[self.hidden_size],
@@ -78,7 +78,7 @@ class Parade(object):
     return output_layer
 
 
-  def reduced_by_avgP(self):
+  def reduced_by_avg(self):
     output_layer = self.output_layer
     output_layer = tf.expand_dims(self.segment_mask, axis=-1) * output_layer
     output_layer = tf.reduce_sum(output_layer, axis=1)  # [B, H]
@@ -88,7 +88,7 @@ class Parade(object):
 
     return output_layer
 
-  def reduced_by_maxP(self):
+  def reduced_by_max(self):
     output_layer = self.output_layer
     output_layer = tf.expand_dims(self.adder, axis=-1) + output_layer
     output_layer = tf.reduce_max(output_layer, axis=1)  # [B, H]

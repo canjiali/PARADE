@@ -11,24 +11,20 @@ python search_pyserini.py  \
   --output_filename /data-crystina/canjia/data/covid/runs/anserini.covid-r3.fusion2.txt.docid_content.txt 
 ```
 #### convert data
-If you want to do a 5-fold cross validatoin, set `do_fold_training=True`;
-otherwise you want to train on a list of qids and evaluate on a list of other qids (though there exist some overlap),
-you set `do_fold_training=False` and configure the `used_qid_list` argument.
+If you want to do 5-fold cross validatoin, set `do_fold_training=True`;
+otherwise set `do_fold_training=False` and configure the `used_qid_list` argument for training and evaluation respectively.
 You're supposed to run this script twice, because for training and evaluation, 
 the `trec_run_filename`, `corpus_filename` should be different, as well as the `used_qid_list`.
-You set `convert_train=True` to convert training while `convert_test=True` for evaluation. 
+You also need to set `convert_train=True` to convert training while `convert_test=True` for evaluation. 
 DON'T do them at the same time.
 
 #### run training and evaluation
 Again if you want to do 5-fold cross validatoin, set `do_fold_training=True`;
-otherwise you want to train on a list of qids and evaluate a list of other qids (though there exist some overlap),
-you set `do_fold_training=False` and configure the `used_qid_list` argument.
+otherwise set `do_fold_training=False` and configure the `used_qid_list` argument.
 The `used_qid_list` should be the same as your `used_qid_list` when you're converting evaluation data.
+If you're not doing fold training, the `dataset` argument will not take effect.
 
-Please set `dataset` as one of the following: `covid19_r1`, `covid19_r2`.
-If you're not doing 5-fold cross validation, it'll not take effect.
-
-Both scripts are in `scripts/run.convert.data.sh` and `scripts/run.reranking.sh`.
+Scripts are available in the `bin` directory.
 
 #### Postprocess
 As required, you need to filter the qid-docid pair that occurs in the previous rounds.
