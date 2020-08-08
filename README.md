@@ -10,10 +10,10 @@ please check out the `covid` branch.
 PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document re-ranking model based on the pre-trained language models.
 
 We support the following PARADE variants:
-- PARADE-AvgP (named `cls_avgP` in the code)
-- PARADE-wAvgP (named `cls_wAvgP` in the code)
-- PARADE-MaxP (namded `cls_maxP` in the code)
-- PARADE-Transformer (namded `cls_transformer` in the code)
+- PARADE-Avg (named `cls_avg` in the code)
+- PARADE-Attn (named `cls_attn` in the code)
+- PARADE-Max (namded `cls_max` in the code)
+- PARADE (namded `cls_transformer` in the code)
 
 We support two instantiations of pre-trained models:
 - BERT
