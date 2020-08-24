@@ -5,8 +5,18 @@
 This repository contains the code for our paper
 - PARADE: Passage Representation Aggregation for Document Reranking
 
-If you're interested in how to run PARADE for the TREC-COVID challenge, 
+If you're interested in running PARADE for the TREC-COVID challenge (we've submitted our runs tagged `mpiid5` from round 2), 
 please check out the **covid** branch.
+
+If you find this paper/code useful, please cite this paper:
+```
+@article{canjia2020parade,
+  author    = {Canjia Li and Andrew Yates and Sean MacAvaney and Ben He and Yingfei Sun},
+  title     = {{PARADE:} Passage Representation Aggregation for Document Reranking},
+  journal   = {arXiv preprint arXiv:CoRR:2008.09093},
+  year      = {2020}
+}
+```
 
 ## Introduction
 PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document reranking model based on the pre-trained language models.
@@ -270,7 +280,7 @@ P_20                    all     0.4365
 ndcg_cut_20             all     0.5098
 ```
 
-### <a name="resource"></a> Useful Resources
+# <a name="resource"></a> Useful Resources
 
 - Fine-tuned models on the MSMARCO passage ranking dataset:
 
@@ -290,7 +300,7 @@ ndcg_cut_20             all     0.5098
 [Robust04](https://zenodo.org/record/3974431/files/robust04.PARADE.runs.tar.gz), 
 [GOV2](https://zenodo.org/record/3974431/files/gov2.PARADE.runs.tar.gz).
 
-### Acknowledgement
+# Acknowledgement
 Some snippets of the codes are borrowed from 
 [NPRF](https://github.com/ucasir/NPRF),
 [Capreolus](https://github.com/capreolus-ir/capreolus),
