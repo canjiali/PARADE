@@ -19,7 +19,7 @@ If you find this paper/code useful, please cite:
 ```
 
 ## Introduction
-PARADE (PAssage Representation Aggregation for Document rE-ranking) is a document reranking model based on the pre-trained language models.
+PARADE (PAssage Representation Aggregation for Document rE-ranking) is an end-to-end document reranking model based on the pre-trained language models.
 
 We support the following PARADE variants:
 - PARADE-Avg (named `cls_avg` in the code)
@@ -88,8 +88,6 @@ When evaluating the title queries on the Robust04 collecting, it outputs
 P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
 ```
-Looks good!
-The above steps can also be done all at once by running `scripts/run.reranking.sh`.
 
 ### 3. Significance Test
 To do a significance test, just configurate the `trec_eval` path in the `evaluation.py` file. 
