@@ -12,6 +12,7 @@ do
 done
 
 # make sure that we find out all the 5 result files
+# if you're in a local machine, you don't need to download
 num_result=$(ls $local_dir |wc -l)
 if [ "$num_result" != "5" ]; then
   echo Exit. Wrong number of results, only $num_result result files found!
