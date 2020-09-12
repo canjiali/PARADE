@@ -32,7 +32,7 @@ We support two instantiations of pre-trained models:
 - ELECTRA
 
 ## Getting Started
-To run PARADE, there're three steps ahead.
+To run PARADE, there're two steps ahead.
 We give a detailed example on how to run the code the Robust04 dataset using the title query.
 
 ### 1. Data Preparation
@@ -49,20 +49,6 @@ scripts/run.convert.data.sh
 You should be able to see 5 sub-folders generated in the `output_dir` folder,
 with each contains a train file and a test file.
 Note that if you're going to run the code on TPU, you need to upload the training/testing data to Google Cloud Storage (GCS).
-
-If you bother getting the raw text from Anserini, 
-you can also replace the `anserini/src/main/java/io/anserini/index/IndexUtils.java` file by the `extra/IndexUtils.java` file in this repo,
-then re-build Anserini (version 0.7.0).
-Below is how we fetch the raw text
-```bash
-anserini_path="path_to_anserini"
-index_path="path_to_index"
-# say you're given a BM25 run file run.BM25.txt
-cut -d ' ' -f3 run.BM25.txt | sort | uniq > docnolist
-${anserini_path}/target/appassembler/bin/IndexUtils -dumpTransformedDocBatch docnolist -index ${index_path}
-```
-then you get the required raw text in the directory that contains docnolist. 
-Alternatively, you can refer to the `search_pyserini.py` file in the **covid** branch and fetch the docs using pyserini.
 Everything is prepared now!
 
 ### 2. Model Traning and Evaluation
@@ -89,37 +75,7 @@ P_20                    all     0.4604
 ndcg_cut_20             all     0.5399
 ```
 
-### 3. Significance Test
-To do a significance test, just configurate the `trec_eval` path in the `evaluation.py` file. 
-Then simply run the following command, here we compare PARADE with BERT-MaxP:
-```
-python evaluation.py \
-  --qrels /data/anserini/src/main/resources/topics-and-qrels/qrels.robust04.txt \
-  --baselines /data2/robust04/reruns/title/bertmaxp.dai/bertbase_onMSMARCO/merge \
-  --runs /data2/robust04/reruns/title/num-segment-16/electra_base_onMSMARCO_cls_transformer/merge_epoch3
-```
-then it outputs
-```
-OrderedDict([('P_20', '0.4277'), ('ndcg_cut_20', '0.4931')])
-OrderedDict([('P_20', '0.4604'), ('ndcg_cut_20', '0.5399')])
-OrderedDict([('P_20', 1.2993259211924425e-11), ('ndcg_cut_20', 8.306604295574242e-09)])
-```
-The upper two lines are the sanity checks of your run performance values.
-The last line shows the p-values.
-PARADE achieves significant improvement over BERT-MaxP (p < 0.01) !
 
-### Knowledge Distillation (Optional)
-You can also perform knowledge distillation for the smaller PARADE models.
-Please follow the above steps to fine-tune the smaller models first.
-Then run the following command:
-```bash
-scripts/run.kd.sh
-```
-It outputs the following results with regard to PARADE using the BERT-small model (4 layers)!
-```bash
-P_20                    all     0.4365
-ndcg_cut_20             all     0.5098
-```
 
 # <a name="resource"></a> Useful Resources
 
@@ -140,6 +96,56 @@ ndcg_cut_20             all     0.5098
 - Our run files on the Robust04 and GOV2 collections: 
 [Robust04](https://zenodo.org/record/3974431/files/robust04.PARADE.runs.tar.gz), 
 [GOV2](https://zenodo.org/record/3974431/files/gov2.PARADE.runs.tar.gz).
+
+# FAQ
+- How to get the raw text?
+
+If you bother getting the raw text from Anserini, 
+you can also replace the `anserini/src/main/java/io/anserini/index/IndexUtils.java` file by the `extra/IndexUtils.java` file in this repo,
+then re-build Anserini (version 0.7.0).
+Below is how we fetch the raw text
+```bash
+anserini_path="path_to_anserini"
+index_path="path_to_index"
+# say you're given a BM25 run file run.BM25.txt
+cut -d ' ' -f3 run.BM25.txt | sort | uniq > docnolist
+${anserini_path}/target/appassembler/bin/IndexUtils -dumpTransformedDocBatch docnolist -index ${index_path}
+```
+then you get the required raw text in the directory that contains docnolist. 
+Alternatively, you can refer to the `search_pyserini.py` file in the **covid** branch and fetch the docs using pyserini.
+
+- How to run a significance test?
+
+To do a significance test, just configurate the `trec_eval` path in the `evaluation.py` file. 
+Then simply run the following command, here we compare PARADE with BERT-MaxP:
+```
+python evaluation.py \
+  --qrels /data/anserini/src/main/resources/topics-and-qrels/qrels.robust04.txt \
+  --baselines /data2/robust04/reruns/title/bertmaxp.dai/bertbase_onMSMARCO/merge \
+  --runs /data2/robust04/reruns/title/num-segment-16/electra_base_onMSMARCO_cls_transformer/merge_epoch3
+```
+then it outputs
+```
+OrderedDict([('P_20', '0.4277'), ('ndcg_cut_20', '0.4931')])
+OrderedDict([('P_20', '0.4604'), ('ndcg_cut_20', '0.5399')])
+OrderedDict([('P_20', 1.2993259211924425e-11), ('ndcg_cut_20', 8.306604295574242e-09)])
+```
+The upper two lines are the sanity checks of your run performance values.
+The last line shows the p-values.
+PARADE achieves significant improvement over BERT-MaxP (p < 0.01) !
+
+- How to run knowledge distillation for PARADE?
+
+Please follow the fine-tuning steps first.
+Then run the following command:
+```bash
+scripts/run.kd.sh
+```
+It outputs the following results with regard to PARADE using the BERT-small model (4 layers)!
+```bash
+P_20                    all     0.4365
+ndcg_cut_20             all     0.5098
+```
 
 # Acknowledgement
 Some snippets of the codes are borrowed from 
