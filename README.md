@@ -3,7 +3,7 @@
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3974431.svg)](https://doi.org/10.5281/zenodo.3974431)
 
 This repository contains the code for our paper
-- PARADE: Passage Representation Aggregation for Document Reranking
+- PARADE: Passage Representation Aggregation for Document Reranking [PDF](https://arxiv.org/abs/2008.09093)
 
 If you're interested in running PARADE for the TREC-COVID challenge (submitted with tag `mpiid5` from Round 2), 
 please check out the **covid** branch.
@@ -33,7 +33,7 @@ We support two instantiations of pre-trained models:
 
 ## Getting Started
 To run PARADE, there're two steps ahead.
-We give a detailed example on how to run the code the Robust04 dataset using the title query.
+We give a detailed example on how to run the code on the Robust04 dataset using the title query.
 
 ### 1. Data Preparation
 To run a 5-fold cross-validation, data for 5 folds are required.
@@ -88,7 +88,7 @@ ndcg_cut_20             all     0.5399
 | \            | 10 / 768 | 0.3622     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_medium_10_base_on_MSMARCO.tar.gz)    |
 | \            | 8 / 768  | 0.3560     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_medium_8_base_on_MSMARCO.tar.gz)   |
 | BERT-Medium  | 8 / 512  | 0.3520     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_medium_on_MSMARCO.tar.gz)    |
-| BERT-Small   | 4 / 512  | 0.3427     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_mini_on_MSMARCO.tar.gz)   |
+| BERT-Small   | 4 / 512  | 0.3427     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_small_on_MSMARCO.tar.gz)   |
 | BERT-Mini    | 4 / 256  | 0.3247     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_mini_on_MSMARCO.tar.gz)  |
 | \            | 2 / 512  | 0.3160     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_tiny_small_on_MSMARCO.tar.gz)    |
 | BERT-Tiny    | 2 /128   | 0.2600     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_tiny_on_MSMARCO.tar.gz)   |
