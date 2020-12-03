@@ -1,6 +1,6 @@
 # PARADE
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3974431.svg)](https://doi.org/10.5281/zenodo.3974431)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4302803.svg)](https://doi.org/10.5281/zenodo.4302803)
 
 This repository contains the code for our paper
 - PARADE: Passage Representation Aggregation for Document Reranking [PDF](https://arxiv.org/abs/2008.09093)
@@ -83,16 +83,17 @@ ndcg_cut_20             all     0.5399
 
 | Model        | L / H    | MRR on MSMARCO DEV | Path |
 |--------------|----------|--------------------|------|
-| ELECTRA-Base | 12 / 768 | 0.3698     | [Download](https://zenodo.org/record/3974431/files/vanilla_electra_base_on_MSMARCO.tar.gz)    |
-| BERT-Base    | 12 / 768 | 0.3637     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_base_on_MSMARCO.tar.gz)    |
-| \            | 10 / 768 | 0.3622     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_medium_10_base_on_MSMARCO.tar.gz)    |
-| \            | 8 / 768  | 0.3560     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_medium_8_base_on_MSMARCO.tar.gz)   |
-| BERT-Medium  | 8 / 512  | 0.3520     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_medium_on_MSMARCO.tar.gz)    |
-| BERT-Small   | 4 / 512  | 0.3427     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_small_on_MSMARCO.tar.gz)   |
-| BERT-Mini    | 4 / 256  | 0.3247     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_mini_on_MSMARCO.tar.gz)  |
-| \            | 2 / 512  | 0.3160     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_tiny_small_on_MSMARCO.tar.gz)    |
-| BERT-Tiny    | 2 /128   | 0.2600     | [Download](https://zenodo.org/record/3974431/files/vanilla_bert_tiny_on_MSMARCO.tar.gz)   |
+| ELECTRA-Base | 12 / 768 | 0.3698     | [Download](https://zenodo.org/record/4302803/files/vanilla_electra_base_on_MSMARCO.tar.gz)    |
+| BERT-Base    | 12 / 768 | 0.3637     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_base_on_MSMARCO.tar.gz)    |
+| \            | 10 / 768 | 0.3622     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_medium_10_base_on_MSMARCO.tar.gz)    |
+| \            | 8 / 768  | 0.3560     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_medium_8_base_on_MSMARCO.tar.gz)   |
+| BERT-Medium  | 8 / 512  | 0.3520     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_medium_on_MSMARCO.tar.gz)    |
+| BERT-Small   | 4 / 512  | 0.3427     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_small_on_MSMARCO.tar.gz)   |
+| BERT-Mini    | 4 / 256  | 0.3247     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_mini_on_MSMARCO.tar.gz)  |
+| \            | 2 / 512  | 0.3160     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_tiny_small_on_MSMARCO.tar.gz)    |
+| BERT-Tiny    | 2 /128   | 0.2600     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_tiny_on_MSMARCO.tar.gz)   |
 
+(Config files and Vocabulary file are available [Here](https://zenodo.org/record/4302803/files/config.tar.gz)
 - Our run files on the Robust04 and GOV2 collections: 
 [Robust04](https://zenodo.org/record/3974431/files/robust04.PARADE.runs.tar.gz), 
 [GOV2](https://zenodo.org/record/3974431/files/gov2.PARADE.runs.tar.gz).
