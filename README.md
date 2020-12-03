@@ -93,7 +93,7 @@ ndcg_cut_20             all     0.5399
 | \            | 2 / 512  | 0.3160     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_tiny_small_on_MSMARCO.tar.gz)    |
 | BERT-Tiny    | 2 /128   | 0.2600     | [Download](https://zenodo.org/record/4302803/files/vanilla_bert_tiny_on_MSMARCO.tar.gz)   |
 
-(Config files and Vocabulary file are available [Here](https://zenodo.org/record/4302803/files/config.tar.gz)
+(Config files and Vocabulary file are available [Here](https://zenodo.org/record/4302803/files/config.tar.gz)）
 - Our run files on the Robust04 and GOV2 collections: 
 [Robust04](https://zenodo.org/record/3974431/files/robust04.PARADE.runs.tar.gz), 
 [GOV2](https://zenodo.org/record/3974431/files/gov2.PARADE.runs.tar.gz).
