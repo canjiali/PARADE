@@ -2,5 +2,5 @@ beautifulsoup4==4.8.1
 lxml==4.4.1
 nltk==3.4.5
 numpy==1.17.3
-tensorflow==1.15.4
+tensorflow==2.7.2
 tensorflow-estimator==1.15.1
